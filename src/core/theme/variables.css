@@ -1,0 +1,10 @@
+.landing-content {
+  --padding-top: 24px;
+  --padding-end: 24px;
+  --padding-bottom: 24px;
+  --padding-start: 24px;
+}
+
+.app-footer-title {
+  text-align: right;
+}
