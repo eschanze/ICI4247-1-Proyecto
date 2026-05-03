@@ -9,7 +9,7 @@ export function LoginPage() {
   return (
     <IonPage>
       <AppHeader />
-      <IonContent>
+      <IonContent className="login-content">
         <h1>Login</h1>
         <IonItem>
           <IonLabel position="stacked">Correo</IonLabel>
