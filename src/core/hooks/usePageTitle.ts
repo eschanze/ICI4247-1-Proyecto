@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useIonViewWillEnter } from '@ionic/react';
 
 export function usePageTitle(title: string) {
-  useEffect(() => {
-    // Este hook concentra un efecto secundario: cambiar el título del navegador.
-    // Separarlo ayuda a reutilizarlo sin repetir la misma lógica en cada página.
+  useIonViewWillEnter(() => {
+    // Ionic mantiene páginas montadas en el router outlet; este ciclo corre cuando la vista pasa a ser activa.
     document.title = title;
-  }, [title]);
+  });
 }

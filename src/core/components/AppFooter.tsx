@@ -2,8 +2,8 @@ import { IonFooter, IonTitle, IonToolbar } from '@ionic/react';
 
 export function AppFooter() {
   return (
-    <IonFooter>
-      <IonToolbar>
+    <IonFooter className="app-footer">
+      <IonToolbar className="app-footer-toolbar">
         <IonTitle className="app-footer-title">
           Proyecto ICI4247-1 2026-1 - Esteban Schanze Cárdenas
         </IonTitle>

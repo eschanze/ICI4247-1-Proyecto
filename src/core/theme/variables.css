@@ -6,6 +6,43 @@
   --padding-start: 24px;
 }
 
+.app-header {
+  --app-header-height: 56px;
+}
+
+.app-header-toolbar {
+  --min-height: var(--app-header-height);
+}
+
+.app-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-header-nav-link {
+  --border-radius: 6px;
+  font-weight: 500;
+}
+
+.app-header-nav-link.active {
+  --background: rgba(0, 84, 233, 0.12);
+  --color: var(--ion-color-primary);
+}
+
+.app-footer {
+  --app-footer-height: 56px;
+}
+
+.app-footer-toolbar {
+  --min-height: var(--app-footer-height);
+}
+
+.app-router-outlet {
+  top: 56px;
+  height: calc(100% - 112px);
+}
+
 .app-footer-title {
   text-align: right;
 }

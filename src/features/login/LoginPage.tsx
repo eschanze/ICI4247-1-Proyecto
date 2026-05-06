@@ -1,6 +1,4 @@
 import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonPage } from '@ionic/react';
-import { AppFooter } from '../../core/components/AppFooter';
-import { AppHeader } from '../../core/components/AppHeader';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 
 export function LoginPage() {
@@ -8,7 +6,6 @@ export function LoginPage() {
 
   return (
     <IonPage>
-      <AppHeader />
       <IonContent className="login-content">
         <h1>Login</h1>
         <IonItem>
@@ -21,7 +18,6 @@ export function LoginPage() {
         </IonItem>
         <IonButton>Ingresar</IonButton>
       </IonContent>
-      <AppFooter />
     </IonPage>
   );
 }
