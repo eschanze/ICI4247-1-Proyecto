@@ -1,13 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Variables globales: colores, bordes, sombra y overrides globales de Ionic. */
+  --ion-font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --app-ink: #1f2933;
+  --app-paper: #fffaf0;
+  --app-surface: #ffffff;
+  --app-border-width: 2px;
+  --app-shadow: 8px 8px 0 var(--app-ink);
+
+  --ion-color-primary: #f2b705;
+  --ion-color-primary-rgb: 242, 183, 5;
+  --ion-color-primary-contrast: var(--app-ink);
+  --ion-color-primary-contrast-rgb: 31, 41, 51;
+  --ion-color-primary-shade: #d5a104;
+  --ion-color-primary-tint: #f3be1e;
+
+  --ion-text-color: var(--app-ink);
+  --ion-background-color: var(--app-paper);
+  --ion-toolbar-background: var(--app-surface);
+  --ion-toolbar-color: var(--app-ink);
+  --ion-item-background: var(--app-surface);
+}
+
+body {
+  font-family: var(--ion-font-family);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ion-title {
+  font-weight: 800;
+}
+
+ion-button {
+  /* Estilo base de los botones Ionic. */
+  --border-radius: 0;
+  --border-width: var(--app-border-width);
+  --border-style: solid;
+  --border-color: var(--app-ink);
+  --box-shadow: 4px 4px 0 var(--app-ink);
+  --padding-bottom: 14px;
+  --padding-end: 22px;
+  --padding-start: 22px;
+  --padding-top: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  min-height: 48px;
+}
+
+ion-button::part(native) {
+  text-transform: none;
+}
+
 .landing-content,
 .login-content {
+  /* Espaciado interno general para las pantallas principales. */
   --padding-top: 24px;
   --padding-end: 24px;
   --padding-bottom: 24px;
   --padding-start: 24px;
 }
 
+.landing-content::part(background),
+.login-content::part(background) {
+  /* Efecto "cuadriculado" */
+  background:
+    /* franja de 1px cada 28px */
+    linear-gradient(rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    /* mismo patrón rotado 90 grados */
+    linear-gradient(90deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    var(--app-paper);
+  background-size: 28px 28px;
+}
+
 .app-header {
+  /* Barra superior de la app. */
   --app-header-height: 56px;
+  border-bottom: var(--app-border-width) solid var(--app-ink);
 }
 
 .app-header-toolbar {
@@ -15,23 +91,33 @@
 }
 
 .app-header-nav {
+  /* Contenedor de links/botones de la navegación principal. */
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .app-header-nav-link {
-  --border-radius: 6px;
-  font-weight: 500;
+  /* Botones de la barra de navegación. */
+  --border-radius: 0;
+  --box-shadow: none;
+  --padding-bottom: 10px;
+  --padding-end: 16px;
+  --padding-start: 16px;
+  --padding-top: 10px;
+  font-weight: 700;
+  min-height: 40px;
 }
 
 .app-header-nav-link.active {
-  --background: rgba(0, 84, 233, 0.12);
-  --color: var(--ion-color-primary);
+  --background: rgba(var(--ion-color-primary-rgb), 0.18);
+  --color: var(--app-ink);
 }
 
 .app-footer {
+  /* Barra inferior fija de la app. */
   --app-footer-height: 56px;
+  border-top: var(--app-border-width) solid var(--app-ink);
 }
 
 .app-footer-toolbar {
@@ -39,10 +125,116 @@
 }
 
 .app-router-outlet {
+  /* Area central renderizada entre header y footer. */
   top: 56px;
   height: calc(100% - 112px);
 }
 
 .app-footer-title {
   text-align: right;
+}
+
+.login-content::part(scroll) {
+  /* Centra la tarjeta del login dentro del scroll de Ionic. */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  /* Caja principal del formulario del login. */
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 420px;
+  padding: 28px;
+  width: min(100%, 420px);
+}
+
+.login-card-header {
+  /* Encabezado interno de la caja del login. */
+  border-bottom: var(--app-border-width) solid var(--app-ink);
+  padding-bottom: 18px;
+}
+
+.login-eyebrow {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.login-card h1 {
+  font-size: clamp(2rem, 9vw, 3.25rem);
+  line-height: 0.95;
+  margin: 0;
+}
+
+.login-fields {
+  /* Grupo de campos del formulario de login. */
+  display: grid;
+  gap: 16px;
+}
+
+.login-field-group {
+  display: grid;
+  gap: 7px;
+}
+
+.login-field-label {
+  color: var(--app-ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.login-field {
+  /* Caja visual de los input Ionic del login. */
+  --background: var(--app-surface);
+  --border-color: var(--app-ink);
+  --border-style: solid;
+  --border-width: var(--app-border-width);
+  --highlight-color-focused: var(--ion-color-primary);
+  --inner-border-width: 0;
+  --padding-bottom: 6px;
+  --padding-end: 12px;
+  --padding-start: 12px;
+  --padding-top: 6px;
+  border: var(--app-border-width) solid var(--app-ink);
+}
+
+.login-forgot-link {
+  /* Link de recuperacion de contraseña. */
+  color: var(--app-ink);
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: flex-start;
+  text-decoration-color: var(--ion-color-primary);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.login-forgot-link:hover,
+.login-forgot-link:focus-visible {
+  background: var(--ion-color-primary);
+  outline: var(--app-border-width) solid var(--app-ink);
+  outline-offset: 3px;
+  text-decoration: none;
+}
+
+.login-submit {
+  /* Boton principal para enviar el login. */
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  /* Ajuste para pantallas móviles. */
+  .login-card {
+    box-shadow: 5px 5px 0 var(--app-ink);
+    padding: 22px;
+  }
 }

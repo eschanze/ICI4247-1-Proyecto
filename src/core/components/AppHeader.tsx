@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 const navigationItems = [
   { label: 'Inicio', path: '/inicio' },
-  { label: 'Login', path: '/login' },
+  { label: 'Ingresar', path: '/login' },
 ];
 
 export function AppHeader() {
