@@ -9,9 +9,10 @@ import { AppHeader } from '../components/AppHeader';
 export function AppRouter() {
   return (
     <IonReactRouter>
+      {/* AppHeader y AppFooter son componentes globales que se muestran en todas las páginas */}
       <AppHeader />
       <IonRouterOutlet className="app-router-outlet">
-        {/* Layout global y rutas principales de la app. */}
+        {/* Rutas principales de la app */}
         <Route exact path="/inicio" component={LandingPage} />
         <Route exact path="/login" component={LoginPage} />
         <Route exact path="/">
