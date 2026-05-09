@@ -1,0 +1,45 @@
+.register-card {
+  /* Variante más ancha del formulario para acomodar todos los campos. */
+  max-width: 720px;
+  width: min(100%, 720px);
+}
+
+.register-fields {
+  /* Utilizamos dos columnas para los campos de registro, pero sin definir explícitamente qué campos van en cada columna. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.register-terms {
+  /* Fila de aceptación de términos y condiciones. */
+  --background: transparent;
+  --inner-border-width: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.register-terms ion-checkbox {
+  /* Checkbox con la misma estética de borde duro del resto de los controles. */
+  --border-color: var(--app-ink);
+  --border-radius: 0;
+  --border-width: var(--app-border-width);
+  --checkbox-background: var(--app-surface);
+  --checkbox-background-checked: var(--ion-color-primary);
+  --checkmark-color: var(--app-ink);
+  margin-inline-end: 12px;
+}
+
+.register-login-link {
+  /* Link secundario para volver al ingreso sin agregar otra sombra visual. */
+  --box-shadow: none;
+  margin-top: -6px;
+}
+
+@media (max-width: 480px) {
+  /* En móvil, el registro tiene que ser una sola columna, si no no cabe. */
+  .register-fields {
+    grid-template-columns: 1fr;
+  }
+}

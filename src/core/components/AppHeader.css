@@ -1,0 +1,34 @@
+.app-header {
+  /* Barra superior de la app. */
+  --app-header-height: 56px;
+  border-bottom: var(--app-border-width) solid var(--app-ink);
+}
+
+.app-header-toolbar {
+  --min-height: var(--app-header-height);
+}
+
+.app-header-nav {
+  /* Contenedor de links/botones de la navegación principal. */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-header-nav-link {
+  /* Botones de la barra de navegación. */
+  --border-radius: 0;
+  --box-shadow: none;
+  --padding-bottom: 10px;
+  --padding-end: 16px;
+  --padding-start: 16px;
+  --padding-top: 10px;
+  font-weight: 700;
+  min-height: 40px;
+}
+
+.app-header-nav-link.active {
+  /* Estado visual para la ruta actualmente activa. */
+  --background: rgba(var(--ion-color-primary-rgb), 0.18);
+  --color: var(--app-ink);
+}

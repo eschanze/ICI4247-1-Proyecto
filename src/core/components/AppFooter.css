@@ -1,0 +1,13 @@
+.app-footer {
+  /* Barra inferior fija de la app. */
+  --app-footer-height: 56px;
+  border-top: var(--app-border-width) solid var(--app-ink);
+}
+
+.app-footer-toolbar {
+  --min-height: var(--app-footer-height);
+}
+
+.app-footer-title {
+  text-align: right;
+}

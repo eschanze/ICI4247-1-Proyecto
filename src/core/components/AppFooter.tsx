@@ -1,4 +1,5 @@
 import { IonFooter, IonTitle, IonToolbar } from '@ionic/react';
+import './AppFooter.css';
 
 export function AppFooter() {
   return (

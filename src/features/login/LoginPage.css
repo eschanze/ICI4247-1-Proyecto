@@ -1,0 +1,129 @@
+.login-content {
+  /* Espaciado interno general para las pantallas principales. */
+  --padding-top: 24px;
+  --padding-end: 24px;
+  --padding-bottom: 24px;
+  --padding-start: 24px;
+}
+
+.login-content::part(background) {
+  /* Efecto "cuadriculado" */
+  background:
+    /* franja de 1px cada 28px */
+    linear-gradient(rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    /* mismo patrón rotado 90 grados */
+    linear-gradient(90deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    var(--app-paper);
+  background-size: 28px 28px;
+}
+
+.login-content::part(scroll) {
+  /* Centra la tarjeta del login dentro del scroll de Ionic. */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.login-card {
+  /* Caja principal del formulario del login. */
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 420px;
+  padding: 28px;
+  width: min(100%, 420px);
+}
+
+.login-card-header {
+  /* Encabezado interno de la caja del login. */
+  border-bottom: var(--app-border-width) solid var(--app-ink);
+  padding-bottom: 18px;
+}
+
+.login-eyebrow {
+  /* Etiqueta superior del formulario de autenticación. */
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.login-card h1 {
+  /* Título principal del formulario. */
+  font-size: clamp(2rem, 9vw, 3.25rem);
+  line-height: 0.95;
+  margin: 0;
+}
+
+.login-fields {
+  /* Grupo de campos del formulario de login. */
+  display: grid;
+  gap: 16px;
+}
+
+.login-field-group {
+  /* Agrupa label y control para mantener una separación consistente. */
+  display: grid;
+  gap: 7px;
+}
+
+.login-field-label {
+  /* Label visible de cada campo. */
+  color: var(--app-ink);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.login-field {
+  /* Caja visual de los input Ionic del login. */
+  --background: var(--app-surface);
+  --border-color: var(--app-ink);
+  --border-style: solid;
+  --border-width: var(--app-border-width);
+  --highlight-color-focused: var(--ion-color-primary);
+  --inner-border-width: 0;
+  --padding-bottom: 6px;
+  --padding-end: 12px;
+  --padding-start: 12px;
+  --padding-top: 6px;
+  border: var(--app-border-width) solid var(--app-ink);
+}
+
+.login-forgot-link {
+  /* Link de recuperación de contraseña. */
+  color: var(--app-ink);
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: flex-start;
+  text-decoration-color: var(--ion-color-primary);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.login-forgot-link:hover,
+.login-forgot-link:focus-visible {
+  /* Estado accesible para mouse y navegación por teclado. */
+  background: var(--ion-color-primary);
+  outline: var(--app-border-width) solid var(--app-ink);
+  outline-offset: 3px;
+  text-decoration: none;
+}
+
+.login-submit {
+  /* Botón principal para enviar el login. */
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  /* Ajuste para pantallas móviles. */
+  .login-card {
+    box-shadow: 5px 5px 0 var(--app-ink);
+    padding: 22px;
+  }
+}

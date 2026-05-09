@@ -3,8 +3,10 @@ import { IonReactRouter } from '@ionic/react-router';
 import { IonRouterOutlet } from '@ionic/react';
 import { LandingPage } from '../../features/landing/LandingPage';
 import { LoginPage } from '../../features/login/LoginPage';
+import { RegisterPage } from '../../features/register/RegisterPage';
 import { AppFooter } from '../components/AppFooter';
 import { AppHeader } from '../components/AppHeader';
+import './AppRouter.css';
 
 export function AppRouter() {
   return (
@@ -15,6 +17,7 @@ export function AppRouter() {
         {/* Rutas principales de la app */}
         <Route exact path="/inicio" component={LandingPage} />
         <Route exact path="/login" component={LoginPage} />
+        <Route exact path="/registro" component={RegisterPage} />
         <Route exact path="/">
           <Redirect to="/inicio" />
         </Route>

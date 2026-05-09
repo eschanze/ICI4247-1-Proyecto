@@ -1,0 +1,5 @@
+.app-router-outlet {
+  /* Área central renderizada entre header y footer. */
+  top: 56px;
+  height: calc(100% - 112px);
+}

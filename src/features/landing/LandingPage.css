@@ -1,0 +1,321 @@
+.landing-content {
+  /* Espaciado interno general para las pantallas principales. */
+  --padding-top: 24px;
+  --padding-end: 24px;
+  --padding-bottom: 24px;
+  --padding-start: 24px;
+}
+
+.landing-content::part(background) {
+  /* Efecto "cuadriculado" */
+  background:
+    /* franja de 1px cada 28px */
+    linear-gradient(rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    /* mismo patrón rotado 90 grados */
+    linear-gradient(90deg, rgba(31, 41, 51, 0.06) 1px, transparent 1px),
+    var(--app-paper);
+  background-size: 28px 28px;
+}
+
+.landing-content::part(scroll) {
+  /* Ionic necesita una altura base para no recortar el contenido del scroll. */
+  display: block;
+  min-height: 100%;
+}
+
+.landing-page {
+  /* Contenedor principal: limita el ancho y separa los bloques de contenido. */
+  display: grid;
+  gap: 28px;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 18px 0 42px;
+  width: 100%;
+}
+
+.landing-hero {
+  /* Hero de dos columnas: texto a la izquierda e imagen a la derecha. */
+  align-items: stretch;
+  background:
+    linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.18), rgba(45, 143, 124, 0.12)),
+    var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: var(--app-shadow);
+  display: grid;
+  gap: 34px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+  min-height: min(620px, calc(100vh - 180px));
+  overflow: hidden;
+}
+
+.landing-copy {
+  /* Alinea verticalmente la propuesta principal dentro del hero. */
+  align-content: center;
+  display: grid;
+  gap: 22px;
+  padding: clamp(28px, 5vw, 64px);
+}
+
+.landing-eyebrow {
+  /* Etiqueta superior del hero. */
+  background: var(--ion-color-primary);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 4px 4px 0 var(--app-ink);
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 800;
+  justify-self: start;
+  letter-spacing: 0.08em;
+  margin: 0;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.landing-copy h1 {
+  /* Título principal del hero. */
+  font-size: clamp(3.2rem, 8vw, 7.2rem);
+  line-height: 0.9;
+  margin: 0;
+  max-width: 720px;
+}
+
+.landing-intro {
+  /* Bajada descriptiva bajo el título principal. */
+  font-size: clamp(1.05rem, 2vw, 1.28rem);
+  font-weight: 600;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 680px;
+}
+
+.landing-actions {
+  /* Grupo de acciones principales del hero. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.landing-action-button {
+  /* Botones principales con mayor presencia visual que los botones base. */
+  --padding-bottom: 18px;
+  --padding-end: 28px;
+  --padding-start: 28px;
+  --padding-top: 18px;
+  font-size: 1.06rem;
+  min-height: 58px;
+}
+
+.landing-map-button {
+  /* Variante secundaria para el acceso al mapa. */
+  --background: var(--app-surface);
+  --color: var(--app-ink);
+}
+
+.landing-visual-panel {
+  /* Panel visual que recorta la imagen dentro del hero. */
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.landing-visual-panel::before {
+  /* Reserva una capa para posibles estados visuales sobre la imagen. */
+  background: transparent;
+  content: '';
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.landing-visual-panel img {
+  /* La máscara suaviza la unión entre el texto y la imagen del hero. */
+  display: block;
+  height: 100%;
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 12%, rgba(0, 0, 0, 0.16) 28%, rgba(0, 0, 0, 0.72) 54%, #000 74%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 12%, rgba(0, 0, 0, 0.16) 28%, rgba(0, 0, 0, 0.72) 54%, #000 74%);
+  object-fit: cover;
+  object-position: 70% center;
+  width: 100%;
+}
+
+.landing-stats-band {
+  /* Franja de indicadores rápidos bajo el hero. */
+  width: 100%;
+}
+
+.landing-stats {
+  /* Grilla de métricas principales. */
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.landing-stat {
+  /* Tarjeta individual de estadística. */
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 152px;
+  padding: 18px;
+}
+
+.landing-stat ion-icon {
+  /* Ícono destacado para reforzar la lectura rápida de cada métrica. */
+  background: rgba(var(--ion-color-primary-rgb), 0.2);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 3px 3px 0 var(--app-ink);
+  font-size: 1.55rem;
+  padding: 9px;
+  width: max-content;
+}
+
+.landing-stat strong {
+  /* El usuario debería leer primero esto así que el tamaño es mayor que el texto de contexto. */
+  font-size: clamp(1.65rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+ 
+.landing-stat span {
+  /* Da contexto al número de arriba. */
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.landing-workflow {
+  /* Sección que explica el flujo del programa. */
+  background: rgba(255, 255, 255, 0.64);
+  border: var(--app-border-width) solid var(--app-ink);
+  display: grid;
+  gap: 28px;
+  padding: clamp(28px, 5vw, 52px);
+  text-align: center;
+}
+
+.landing-workflow h2 {
+  /* Título de la sección de flujo. */
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1;
+  margin: 0;
+}
+
+.landing-steps {
+  /* Grilla de pasos del proceso municipal. */
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.landing-step {
+  /* Tarjeta de cada paso del proceso. */
+  align-items: center;
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 260px;
+  padding: 22px 16px;
+}
+
+.landing-step-icon {
+  /* Contenedor circular del ícono de paso. */
+  align-items: center;
+  background: #daa520;
+  border: var(--app-border-width) solid var(--app-ink);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--app-ink);
+  color: var(--app-surface);
+  display: flex;
+  height: 66px;
+  justify-content: center;
+  width: 66px;
+}
+
+.landing-step-icon ion-icon {
+  font-size: 1.8rem;
+}
+
+.landing-step-number {
+  /* Texto corto que identifica el orden del paso. */
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 8px 0 0;
+  text-transform: uppercase;
+}
+
+.landing-step h3 {
+  /* Nombre del paso. */
+  font-size: 1.25rem;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.landing-step p:last-child {
+  /* Descripción del paso. */
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+}
+
+@media (max-width: 1020px) {
+  /* En tablets, bajar de cuatro a dos columnas. */
+  .landing-stats,
+  .landing-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  /* En pantallas más chicas, el hero pasa a una sola columna. */
+  .landing-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .landing-visual-panel {
+    min-height: 320px;
+  }
+
+  .landing-visual-panel::before {
+    background: transparent;
+  }
+
+  .landing-visual-panel img {
+    /* La máscara se ajusta porque sino la imagen queda bajo el texto. */
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.2) 22%, #000 52%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.2) 22%, #000 52%);
+  }
+}
+
+@media (max-width: 640px) {
+  /* En móviles, los bloques quedan apilados y los botones ocupan todo el ancho. */
+  .landing-page {
+    padding-top: 6px;
+  }
+
+  .landing-stats,
+  .landing-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-action-button {
+    width: 100%;
+  }
+
+  .landing-visual-panel {
+    min-height: 240px;
+  }
+
+  .landing-stat,
+  .landing-step {
+    min-height: 0;
+  }
+}

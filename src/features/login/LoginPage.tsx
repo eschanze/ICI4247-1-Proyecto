@@ -1,5 +1,6 @@
 import { IonButton, IonContent, IonInput, IonItem, IonPage } from '@ionic/react';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
+import './LoginPage.css';
 
 export function LoginPage() {
   usePageTitle('Login - Programa No+Cables');
@@ -38,6 +39,10 @@ export function LoginPage() {
 
           <IonButton className="login-submit" expand="block">
             Ingresar
+          </IonButton>
+
+          <IonButton className="register-login-link" fill="clear" routerLink="/registro">
+            Crear cuenta
           </IonButton>
         </section>
       </IonContent>

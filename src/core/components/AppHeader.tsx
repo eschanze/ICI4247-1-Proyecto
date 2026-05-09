@@ -1,9 +1,11 @@
 import { IonButton, IonButtons, IonHeader, IonTitle, IonToolbar } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
+import './AppHeader.css';
 
 const navigationItems = [
   { label: 'Inicio', path: '/inicio' },
   { label: 'Ingresar', path: '/login' },
+  { label: 'Registrarse', path: '/registro' },
 ];
 
 export function AppHeader() {
