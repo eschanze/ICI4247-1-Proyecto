@@ -32,3 +32,44 @@
   --background: rgba(var(--ion-color-primary-rgb), 0.18);
   --color: var(--app-ink);
 }
+
+.app-header-user-badge {
+  /*
+   * Chip que muestra el usuario logueado en la esquina superior derecha.
+   * Usa un borde y fondo suave para diferenciarse de los links de navegación.
+   */
+  align-items: center;
+  background: rgba(var(--ion-color-primary-rgb), 0.12);
+  border: var(--app-border-width) solid var(--app-ink);
+  display: flex;
+  gap: 6px;
+  margin-left: 12px;
+  padding: 4px 4px 4px 10px;
+}
+
+.app-header-user-badge ion-icon {
+  /* Ícono de persona dentro del badge de sesión. */
+  font-size: 1.25rem;
+}
+
+.app-header-username {
+  /* Nombre del usuario dentro del badge. */
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.app-header-logout {
+  /* Botón de cerrar sesión: compacto y sin sombra para no competir visualmente. */
+  --box-shadow: none;
+  --color: var(--app-ink);
+  --padding-bottom: 6px;
+  --padding-end: 8px;
+  --padding-start: 8px;
+  --padding-top: 6px;
+  font-size: 1.1rem;
+  min-height: 32px;
+}
+
+.app-header-logout:hover {
+  --color: #c0392b;
+}

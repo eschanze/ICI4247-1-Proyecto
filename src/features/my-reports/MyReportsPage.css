@@ -1,0 +1,299 @@
+.my-reports-container {
+  /* Contenedor principal con ancho limitado y centrado. */
+  margin: 0 auto;
+  max-width: 860px;
+  padding: 18px 0 42px;
+  width: 100%;
+}
+
+.my-reports-header {
+  /* Cabecera con título y botón de nuevo reporte alineados a los extremos. */
+  align-items: flex-end;
+  border-bottom: var(--app-border-width) solid var(--app-ink);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+}
+
+.my-reports-header h1 {
+  /* Título principal de la página. */
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 0.95;
+  margin: 6px 0 0;
+}
+
+.my-reports-list {
+  /* Lista de tarjetas de reporte apiladas verticalmente. */
+  display: grid;
+  gap: 16px;
+}
+
+.my-report-card {
+  /* Tarjeta individual con el estilo neobrutalist del proyecto. */
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 6px 6px 0 var(--app-ink);
+  overflow: hidden;
+}
+
+.my-report-card-header {
+  /* Cabecera clicable de cada tarjeta para expandir/colapsar. */
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--app-ink);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--ion-font-family);
+  gap: 16px;
+  padding: 20px 22px;
+  text-align: left;
+  width: 100%;
+}
+
+.my-report-card-header:hover {
+  background: rgba(var(--ion-color-primary-rgb), 0.06);
+}
+
+.my-report-card-main {
+  /* Bloque de dirección y fecha: crece para empujar los badges a la derecha. */
+  flex: 1;
+  min-width: 0;
+}
+
+.my-report-card-street {
+  /* Dirección del reporte (título de la tarjeta). */
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.my-report-card-date {
+  /* Fecha de creación debajo de la dirección. */
+  align-items: center;
+  color: #616e7c;
+  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 600;
+  gap: 5px;
+  margin: 4px 0 0;
+}
+
+.my-report-card-badges {
+  /* Grupo de badges (estado + urgencia). */
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.my-report-card-badges ion-badge {
+  /* Badges con bordes para mantener la estética neobrutalist. */
+  border: var(--app-border-width) solid var(--app-ink);
+  border-radius: 0;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 5px 10px;
+  text-transform: capitalize;
+}
+
+.my-report-card-chevron {
+  /* Ícono indicador de expandir/colapsar. */
+  flex-shrink: 0;
+  font-size: 1.3rem;
+}
+
+.my-report-card-detail {
+  /* Panel de detalle que aparece al expandir. */
+  border-top: var(--app-border-width) solid var(--app-ink);
+  display: grid;
+  gap: 20px;
+  padding: 22px;
+}
+
+.my-report-detail-section h3 {
+  /* Sub-título dentro del detalle (Descripción, Foto, Historial). */
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.my-report-detail-section p {
+  /* Texto del detalle. */
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.my-report-detail-photo {
+  /* Contenedor de la foto adjunta en el detalle. */
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 4px 4px 0 var(--app-ink);
+  display: inline-block;
+  max-width: 360px;
+}
+
+.my-report-detail-photo img {
+  display: block;
+  height: auto;
+  max-height: 260px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.my-report-detail-scheduled {
+  /* Bloque de fecha programada de intervención. */
+  align-items: center;
+  background: rgba(var(--ion-color-primary-rgb), 0.12);
+  border: var(--app-border-width) solid var(--app-ink);
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.my-report-detail-scheduled ion-icon {
+  /* Ícono de calendario antes de la fecha programada. */
+  font-size: 1.3rem;
+}
+
+.my-report-timeline {
+  /*
+   * Lista ordenada que muestra el historial de cambios de estado.
+   * list-style: none quita los números porque usamos dots personalizados.
+   */
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.my-report-timeline-entry {
+  /* Cada entrada del timeline: dot + contenido alineados horizontalmente. */
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 18px 1fr;
+  padding: 10px 0;
+  position: relative;
+}
+
+.my-report-timeline-entry:not(:last-child)::after {
+  /*
+   * Línea vertical que conecta un dot con el siguiente.
+   * Se usa un pseudo-elemento ::after para no agregar HTML extra.
+   */
+  background: var(--app-ink);
+  content: '';
+  height: calc(100% - 8px);
+  left: 7px;
+  position: absolute;
+  top: 28px;
+  width: 2px;
+}
+
+.my-report-timeline-dot {
+  /* Punto circular a la izquierda de cada entrada del historial. */
+  background: var(--app-paper);
+  border: var(--app-border-width) solid var(--app-ink);
+  border-radius: 999px;
+  height: 16px;
+  margin-top: 2px;
+  width: 16px;
+}
+
+.my-report-timeline-entry.current .my-report-timeline-dot {
+  /* El dot del estado actual se llena con el color primario para destacar. */
+  background: var(--ion-color-primary);
+}
+
+.my-report-timeline-content {
+  /* Contenido textual a la derecha de cada dot. */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.my-report-timeline-content strong {
+  font-size: 0.95rem;
+}
+
+.my-report-timeline-date {
+  /* Fecha/hora del cambio de estado. */
+  color: #616e7c;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.my-report-timeline-comment {
+  /* Comentario del funcionario sobre el cambio de estado. */
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  border-left: 4px solid var(--ion-color-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 4px 0 0;
+  padding: 8px 12px;
+}
+
+.my-reports-empty {
+  /* Estado vacío cuando el usuario no tiene reportes. */
+  align-items: center;
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 48px 28px;
+  text-align: center;
+}
+
+.my-reports-empty ion-icon {
+  /* Ícono grande del empty state. */
+  color: #9aa5b1;
+  font-size: 3.5rem;
+}
+
+.my-reports-empty h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.my-reports-empty p {
+  color: #616e7c;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .my-report-card-header {
+    /* En móvil, apila los elementos de la cabecera verticalmente. */
+    flex-wrap: wrap;
+  }
+
+  .my-report-card-badges {
+    /* Los badges pasan debajo de la dirección. */
+    order: 3;
+    width: 100%;
+  }
+
+  .my-reports-header {
+    /* En pantallas chicas apila título y botón. */
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .my-report-card {
+    box-shadow: 4px 4px 0 var(--app-ink);
+  }
+}

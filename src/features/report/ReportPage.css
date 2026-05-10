@@ -1,0 +1,119 @@
+.report-card {
+  /* Variante del login-card más ancha para acomodar el formulario de reporte. */
+  max-width: 680px;
+  width: min(100%, 680px);
+}
+
+.report-fields {
+  /* Grilla de dos columnas para los campos del formulario. */
+  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.report-field-full {
+  /*
+   * grid-column: 1 / -1 hace que el campo ocupe ambas columnas.
+   * Se usa para dirección y descripción que necesitan más espacio.
+   */
+  grid-column: 1 / -1;
+}
+
+.report-textarea-item {
+  /* Permite que el textarea crezca en altura. */
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+}
+
+.report-urgency-field {
+  width: 150px;
+  max-width: 100%;
+}
+
+.report-urgency-select {
+  width: 100%;
+}
+
+.report-error {
+  /* Mensaje de validación en rojo bajo el campo con error. */
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 4px 0 0;
+}
+
+.report-file-input-hidden {
+  /* Oculta el input nativo de archivos: lo activamos por JS desde un botón estilizado. */
+  display: none;
+}
+
+.report-upload-button {
+  /* Botón para seleccionar la foto. */
+  --background: var(--app-surface);
+  --color: var(--app-ink);
+  align-self: start;
+}
+
+.report-photo-preview {
+  /* Contenedor de la vista previa de la foto con borde neobrutalist. */
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 4px 4px 0 var(--app-ink);
+  max-width: 280px;
+  position: relative;
+}
+
+.report-photo-preview img {
+  /* La imagen se ajusta al contenedor manteniendo sus proporciones. */
+  display: block;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.report-photo-remove {
+  /* Botón flotante para eliminar la foto seleccionada. */
+  --background: var(--app-surface);
+  --background-activated: var(--app-surface);
+  --background-focused: var(--app-surface);
+  --background-hover: var(--app-surface);
+  --border-radius: 999px;
+  --box-shadow: none;
+  --color: #c0392b;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  border: 0;
+  height: 30px;
+  margin: 0;
+  min-height: 30px;
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 30px;
+}
+
+.report-photo-remove::part(native) {
+  border: 0;
+  box-shadow: none;
+}
+
+.report-photo-remove ion-icon {
+  font-size: 24px;
+}
+
+.report-photo-field {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 480px) {
+  /* En móvil, el formulario pasa a una sola columna. */
+  .report-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .report-card {
+    box-shadow: 5px 5px 0 var(--app-ink);
+    padding: 22px;
+  }
+}

@@ -115,9 +115,33 @@
   text-decoration: none;
 }
 
+.login-error {
+  /* Mensaje de error de login (credenciales incorrectas, campos vacíos, etc.). */
+  background: rgba(192, 57, 43, 0.08);
+  border: var(--app-border-width) solid #c0392b;
+  color: #c0392b;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 10px 14px;
+}
+
 .login-submit {
   /* Botón principal para enviar el login. */
   margin-top: 4px;
+}
+
+.login-demo-hint {
+  /* Caja que muestra las credenciales de demo. */
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  border: 1px dashed var(--app-ink);
+  font-size: 0.82rem;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.login-demo-hint p {
+  margin: 2px 0;
 }
 
 @media (max-width: 480px) {

@@ -4,6 +4,8 @@ import { IonRouterOutlet } from '@ionic/react';
 import { LandingPage } from '../../features/landing/LandingPage';
 import { LoginPage } from '../../features/login/LoginPage';
 import { RegisterPage } from '../../features/register/RegisterPage';
+import { ReportPage } from '../../features/report/ReportPage';
+import { MyReportsPage } from '../../features/my-reports/MyReportsPage';
 import { AppFooter } from '../components/AppFooter';
 import { AppHeader } from '../components/AppHeader';
 import './AppRouter.css';
@@ -18,6 +20,8 @@ export function AppRouter() {
         <Route exact path="/inicio" component={LandingPage} />
         <Route exact path="/login" component={LoginPage} />
         <Route exact path="/registro" component={RegisterPage} />
+        <Route exact path="/reportar" component={ReportPage} />
+        <Route exact path="/mis-reportes" component={MyReportsPage} />
         <Route exact path="/">
           <Redirect to="/inicio" />
         </Route>
