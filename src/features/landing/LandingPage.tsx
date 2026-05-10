@@ -3,10 +3,7 @@ import {
   calendarOutline,
   checkmarkDoneOutline,
   clipboardOutline,
-  locationOutline,
-  peopleOutline,
   searchOutline,
-  statsChartOutline,
 } from 'ionicons/icons';
 import landingBackground from '../../assets/landing_bg.png';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
@@ -15,10 +12,10 @@ import './LandingPage.css';
 // Datos para la sección de estadísticas rápidas en la landing page
 // Por ahora son falsos, en la entrega 2 se reemplazarán por datos reales obtenidos del backend
 const programStats = [
-  { icon: clipboardOutline, label: 'Reportes activos', value: '16' },
-  { icon: statsChartOutline, label: 'Metros de cable retirados', value: '3.420 m' },
-  { icon: locationOutline, label: 'Sectores cubiertos', value: '14' },
-  { icon: peopleOutline, label: 'Vecinos participantes', value: '870' },
+  { label: 'Reportes activos', value: '2' },
+  { label: 'Metros de cable retirados', value: '3.420 m' },
+  { label: 'Sectores cubiertos', value: '14' },
+  { label: 'Vecinos participantes', value: '870' },
 ];
 
 // Texto e íconos para cada paso que se muestra en la landing page
@@ -85,7 +82,6 @@ export function LandingPage() {
             <div className="landing-stats">
               {programStats.map((stat) => (
                 <div className="landing-stat" key={stat.label}>
-                  <IonIcon icon={stat.icon} aria-hidden="true" />
                   <strong>{stat.value}</strong>
                   <span>{stat.label}</span>
                 </div>

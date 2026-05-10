@@ -44,7 +44,7 @@
   display: grid;
   gap: 34px;
   grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
-  min-height: min(620px, calc(100vh - 180px));
+  min-height: min(590px, calc(100vh - 200px));
   overflow: hidden;
 }
 
@@ -58,16 +58,13 @@
 
 .landing-eyebrow {
   /* Etiqueta superior del hero. */
-  background: var(--ion-color-primary);
-  border: var(--app-border-width) solid var(--app-ink);
-  box-shadow: 4px 4px 0 var(--app-ink);
+  color: rgba(var(--ion-color-primary-rgb), 0.95);
   display: inline-flex;
   font-size: 0.82rem;
   font-weight: 800;
   justify-self: start;
   letter-spacing: 0.08em;
   margin: 0;
-  padding: 8px 12px;
   text-transform: uppercase;
 }
 
@@ -157,21 +154,12 @@
   /* Tarjeta individual de estadística. */
   background: var(--app-surface);
   border: var(--app-border-width) solid var(--app-ink);
+  justify-content: center;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 152px;
-  padding: 18px;
-}
-
-.landing-stat ion-icon {
-  /* Ícono destacado para reforzar la lectura rápida de cada métrica. */
-  background: rgba(var(--ion-color-primary-rgb), 0.2);
-  border: var(--app-border-width) solid var(--app-ink);
-  box-shadow: 3px 3px 0 var(--app-ink);
-  font-size: 1.55rem;
-  padding: 9px;
-  width: max-content;
+  gap: 8px;
+  min-height: 118px;
+  padding: 16px;
 }
 
 .landing-stat strong {
