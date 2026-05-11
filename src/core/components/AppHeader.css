@@ -27,6 +27,12 @@
   min-height: 40px;
 }
 
+.app-header-nav-icon {
+  /* Ícono de cada link de navegación, oculto en desktop. */
+  display: none;
+  font-size: 1.3rem;
+}
+
 .app-header-nav-link.active {
   /* Estado visual para la ruta actualmente activa. */
   --background: rgba(var(--ion-color-primary-rgb), 0.18);
@@ -72,4 +78,38 @@
 
 .app-header-logout:hover {
   --color: #c0392b;
+}
+
+@media (max-width: 640px) {
+  .app-header-toolbar ion-title {
+    display: block;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-header-nav {
+    /*
+     * La navegación se mueve a la barra inferior (AppFooter),
+     * así que aquí se oculta completamente.
+     */
+    display: none;
+  }
+
+  .app-header-user-badge {
+    /* Más compacto en móvil. */
+    gap: 4px;
+    margin-left: 6px;
+    padding: 3px 3px 3px 8px;
+  }
+
+  .app-header-username {
+    /* Nombre más pequeño en móvil. */
+    font-size: 0.75rem;
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }

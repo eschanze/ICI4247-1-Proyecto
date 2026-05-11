@@ -3,3 +3,14 @@
   top: 56px;
   height: calc(100% - 112px);
 }
+
+@media (max-width: 640px) {
+  .app-router-outlet {
+    /*
+     * En móvil el footer se convierte en barra de navegación inferior,
+     * así que se debe ajustar un poco el alto del outlet.
+     */
+    height: calc(100% - 118px);
+  }
+}
+

@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { IonButton, IonContent, IonInput, IonItem, IonPage, useIonRouter } from '@ionic/react';
+import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../../core/auth/DummyAuth';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import './LoginPage.css';
@@ -9,6 +10,7 @@ export function LoginPage() {
 
   const { user, login } = useDummyAuth();
   const router = useIonRouter();
+  const location = useLocation();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,10 +18,10 @@ export function LoginPage() {
 
   /* Si ya está logeado, redirigir a la página principal del ciudadano. */
   useEffect(() => {
-    if (user) {
+    if (user && location.pathname === '/login') {
       router.push('/reportar', 'root');
     }
-  }, [router, user]);
+  }, [router, user, location.pathname]);
 
   function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -9,14 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import {
-  IonBadge,
-  IonButton,
-  IonContent,
-  IonIcon,
-  IonPage,
-  useIonRouter,
-} from '@ionic/react';
+import { IonBadge,IonButton,IonContent,IonIcon,IonPage,useIonRouter } from '@ionic/react';
 import {
   addCircleOutline,
   alertCircleOutline,
@@ -25,17 +18,13 @@ import {
   chevronUpOutline,
   timeOutline,
 } from 'ionicons/icons';
+import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../../core/auth/DummyAuth';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { Report, ReportStatus } from '../../core/data/ReportContext';
 import './MyReportsPage.css';
 
-/*
- * Record<K, V> es un tipo de TypeScript que define un objeto donde
- * todas las claves son de tipo K y todos los valores de tipo V.
- * Aquí mapea cada estado posible a su etiqueta y color visual.
- */
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   pendiente: { label: 'Pendiente', color: 'medium' },
   verificado: { label: 'Verificado', color: 'primary' },
@@ -51,10 +40,6 @@ const URGENCY_COLORS: Record<string, string> = {
   alta: 'danger',
 };
 
-/*
- * Convierte un string ISO a formato legible en español.
- * toLocaleDateString con locale 'es-CL' formatea la fecha según la convención chilena.
- */
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
     year: 'numeric',
@@ -74,11 +59,7 @@ function formatShortDate(isoDate: string): string {
   });
 }
 
-/*
- * ReportCard muestra un reporte individual con opción de expandir/colapsar.
- * Está separado del componente principal para mantener cada estado de expansión
- * independiente (cada tarjeta tiene su propio useState).
- */
+/* ReportCard muestra un reporte individual con opción de expandir/colapsar. */
 function ReportCard({ report }: { report: Report }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -176,22 +157,19 @@ export function MyReportsPage() {
   const { user } = useDummyAuth();
   const { getReportsByUser } = useReports();
   const router = useIonRouter();
+  const location = useLocation();
 
   /* Redirigir si no hay sesión */
   useEffect(() => {
-    if (!user) {
+    if (!user && location.pathname === '/mis-reportes') {
       router.push('/login', 'root');
     }
-  }, [router, user]);
+  }, [router, user, location.pathname]);
 
   if (!user) {
     return null;
   }
 
-  /*
-   * Obtenemos solo los reportes del usuario actual.
-   * .sort() con getTime() ordena del más reciente al más antiguo.
-   */
   const userReports = getReportsByUser(user.username).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );

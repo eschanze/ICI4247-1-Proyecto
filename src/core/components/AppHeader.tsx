@@ -1,5 +1,13 @@
 import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/react';
-import { personCircleOutline, logOutOutline } from 'ionicons/icons';
+import {
+  addCircleOutline,
+  documentTextOutline,
+  homeOutline,
+  logInOutline,
+  logOutOutline,
+  personAddOutline,
+  personCircleOutline,
+} from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../auth/DummyAuth';
 import './AppHeader.css';
@@ -9,9 +17,9 @@ import './AppHeader.css';
  * Son las rutas públicas de la app.
  */
 const publicNavItems = [
-  { label: 'Inicio', path: '/inicio' },
-  { label: 'Ingresar', path: '/login' },
-  { label: 'Registrarse', path: '/registro' },
+  { label: 'Inicio', path: '/inicio', icon: homeOutline },
+  { label: 'Ingresar', path: '/login', icon: logInOutline },
+  { label: 'Registrarse', path: '/registro', icon: personAddOutline },
 ];
 
 /*
@@ -19,9 +27,9 @@ const publicNavItems = [
  * Reemplaza "Ingresar" y "Registrarse" por las funcionalidades del ciudadano.
  */
 const citizenNavItems = [
-  { label: 'Inicio', path: '/inicio' },
-  { label: 'Reportar', path: '/reportar' },
-  { label: 'Mis reportes', path: '/mis-reportes' },
+  { label: 'Inicio', path: '/inicio', icon: homeOutline },
+  { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
+  { label: 'Mis reportes', path: '/mis-reportes', icon: documentTextOutline },
 ];
 
 /*
@@ -29,9 +37,9 @@ const citizenNavItems = [
  * Por ahora son básicos; se extenderán con el panel de gestión en futuras entregas.
  */
 const adminNavItems = [
-  { label: 'Inicio', path: '/inicio' },
-  { label: 'Reportar', path: '/reportar' },
-  { label: 'Mis reportes', path: '/mis-reportes' },
+  { label: 'Inicio', path: '/inicio', icon: homeOutline },
+  { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
+  { label: 'Mis reportes', path: '/mis-reportes', icon: documentTextOutline },
 ];
 
 export function AppHeader() {
@@ -53,8 +61,10 @@ export function AppHeader() {
                 className={location.pathname === item.path ? 'app-header-nav-link active' : 'app-header-nav-link'}
                 fill="clear"
                 routerLink={item.path}
+                routerDirection="root"
               >
-                {item.label}
+                <IonIcon icon={item.icon} className="app-header-nav-icon" aria-hidden="true" />
+                <span className="app-header-nav-label">{item.label}</span>
               </IonButton>
             ))}
           </nav>

@@ -22,6 +22,7 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { cameraOutline, closeCircleOutline } from 'ionicons/icons';
+import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../../core/auth/DummyAuth';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
@@ -34,17 +35,9 @@ export function ReportPage() {
   const { user } = useDummyAuth();
   const { addReport } = useReports();
 
-  /*
-   * useIonRouter() da acceso al router de Ionic para navegación programática.
-   * A diferencia de routerLink (que va en el JSX), push() permite navegar
-   * después de ejecutar lógica (ej: validar formulario, guardar datos).
-   */
   const router = useIonRouter();
+  const location = useLocation();
 
-  /*
-   * useIonToast() retorna un array con [present, dismiss].
-   * present() muestra un toast temporal en pantalla.
-   */
   const [presentToast] = useIonToast();
 
   const [street, setStreet] = useState('');
@@ -53,35 +46,20 @@ export function ReportPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ street?: string; description?: string }>({});
 
-  /*
-   * useRef crea una referencia mutable que persiste entre renders sin causar re-renders.
-   * Aquí la usamos para acceder al <input type="file"> nativo del DOM,
-   * ya que Ionic no tiene un componente propio para selección de archivos.
-   */
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && location.pathname === '/reportar') {
       router.push('/login', 'root');
     }
-  }, [router, user]);
+  }, [router, user, location.pathname]);
 
   if (!user) {
     return null;
   }
 
-  /*
-   * Capturamos el username en una constante después del guard clause.
-   * TypeScript no puede garantizar que `user` siga siendo no-null dentro de closures
-   * (como handleSubmit), pero sí puede rastrear una const local que se asigna tras el if.
-   */
   const currentUsername = user.username;
 
-  /*
-   * Maneja la selección de un archivo de imagen.
-   * FileReader convierte el archivo a un Data URL (string base64)
-   * que se puede mostrar directamente en un <img> y almacenar en el estado.
-   */
   function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -208,11 +186,6 @@ export function ReportPage() {
             <div className="login-field-group report-photo-field">
               <span className="login-field-label">Foto adjunta (opcional)</span>
 
-              {/*
-                El input nativo está oculto visualmente (display:none).
-                Al hacer clic en el IonButton, se dispara el click del input
-                via la referencia (fileInputRef.current.click()).
-              */}
               <input
                 ref={fileInputRef}
                 type="file"

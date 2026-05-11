@@ -111,10 +111,7 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     setReports((prev) => [...prev, newReport]);
   }, []);
 
-  /*
-   * useCallback con dependencia [reports]: se re-crea solo cuando el array de reportes cambia.
-   * Array.filter() retorna un nuevo array con solo los elementos que cumplen la condición.
-   */
+  // Memoizamos la función; depende de reports
   const getReportsByUser = useCallback(
     (username: string) => reports.filter((report) => report.authorUsername === username),
     [reports],

@@ -18,8 +18,12 @@
 }
 
 .login-content::part(scroll) {
-  /* Centra la tarjeta del login dentro del scroll de Ionic. */
-  align-items: center;
+  /*
+   * Usamos flex con flex-start + margin auto en la tarjeta para que
+   * el contenido se centre solo cuando sobra espacio, pero en pantallas
+   * pequeñas (o formularios largos) el scroll parte desde arriba.
+   */
+  align-items: flex-start;
   display: flex;
   justify-content: center;
   min-height: 100%;
@@ -33,6 +37,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  margin: auto 0;
   max-width: 420px;
   padding: 28px;
   width: min(100%, 420px);

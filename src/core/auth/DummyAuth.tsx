@@ -15,7 +15,7 @@ export interface DummyUser {
   role: UserRole;
 }
 
-/* Forma del contexto que consumen los componentes hijos. */
+/* Interfaz que usan los componentes hijos */
 interface DummyAuthContextValue {
   user: DummyUser | null;                                          // usuario actual o null si no hay sesión activa
   login: (username: string, password: string) => boolean;          // intenta autenticar; retorna true si las credenciales coinciden
@@ -23,36 +23,23 @@ interface DummyAuthContextValue {
 }
 
 /*
- * Lista de credenciales válidas para la demo.
- * En producción esto no existiría: la validación ocurriría en el backend.
+ * Lista de credenciales válidas para la demo (entrega parcial 1)
  */
 const DUMMY_CREDENTIALS: { username: string; password: string; role: UserRole }[] = [
   { username: 'ciudadano', password: 'contra123', role: 'ciudadano' },
   { username: 'admin', password: 'contra123', role: 'funcionario' },
 ];
 
-/*
- * createContext crea un "canal" de datos que cualquier componente hijo puede leer
- * sin necesidad de pasar props manualmente por cada nivel del árbol.
- * El valor inicial es null porque el Provider real se monta en App.tsx.
- */
 const DummyAuthContext = createContext<DummyAuthContextValue | null>(null);
 
 /*
  * DummyAuthProvider envuelve la app y mantiene el estado de sesión.
  * Los componentes hijos acceden al estado via el hook useDummyAuth().
- *
- * ReactNode es el tipo que React usa para "cualquier cosa renderizable"
- * (elementos, strings, arrays, fragments, etc.).
  */
 export function DummyAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<DummyUser | null>(null);
 
-  /*
-   * useCallback memoriza la función para que no se re-cree en cada render.
-   * Sin useCallback, cada render generaría una nueva referencia de `login`,
-   * lo que podría causar renders innecesarios en componentes que la consuman.
-   */
+  // Memoizamos login para no romper dependencias en otros componentes
   const login = useCallback((username: string, password: string): boolean => {
     const match = DUMMY_CREDENTIALS.find(
       (cred) => cred.username === username && cred.password === password,
