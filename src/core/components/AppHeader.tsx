@@ -56,8 +56,8 @@ export function AppHeader() {
         <IonTitle>
           <div className="app-header-brand">
             <img src={logoMuni} alt="Logo" className="app-header-logo" />
-            <span className="app-header-title-desktop">Municipalidad de Santo Domingo</span>
-            <span className="app-header-title-mobile">Santo Domingo</span>
+            <span className="app-header-title-desktop">Municipalidad de Santo Domingo - No+Cables</span>
+            <span className="app-header-title-mobile">No+Cables</span>
           </div>
         </IonTitle>
         <IonButtons slot="end">

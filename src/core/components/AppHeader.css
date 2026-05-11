@@ -84,10 +84,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-left: 8px;
 }
 
 .app-header-logo {
-  height: 36px;
+  height: 56px;
   width: auto;
   object-fit: contain;
 }
@@ -99,7 +100,6 @@
 @media (max-width: 640px) {
   .app-header-toolbar ion-title {
     font-size: 1.1rem;
-    padding-left: 0px;
   }
 
   .app-header-title-desktop {
@@ -112,10 +112,11 @@
 
   .app-header-brand {
     gap: 8px;
+    margin-left: 6px;
   }
 
   .app-header-logo {
-    height: 28px;
+    height: 46px;
   }
 
   .app-header-nav {
