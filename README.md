@@ -180,13 +180,12 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 npm install
 ```
 
-2. Iniciar el servidor de desarrollo (con recarga rápida):
+2. Iniciar el servidor de desarrollo:
 ```bash
 npm run dev
 ```
 
-El frontend quedará disponible en su navegador en `http://localhost:5173`.
-*(Nota: El comando `npm run build` se puede usar para la versión de producción).*
+El frontend quedará disponible en su navegador en `http://localhost:5173`. El comando `npm run build` se puede usar para la versión de producción.
 
 ### Backend
 
