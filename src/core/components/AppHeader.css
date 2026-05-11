@@ -80,13 +80,42 @@
   --color: #c0392b;
 }
 
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+.app-header-title-mobile {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .app-header-toolbar ion-title {
-    display: block;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.1rem;
+    padding-left: 0px;
+  }
+
+  .app-header-title-desktop {
+    display: none;
+  }
+
+  .app-header-title-mobile {
+    display: inline;
+  }
+
+  .app-header-brand {
+    gap: 8px;
+  }
+
+  .app-header-logo {
+    height: 28px;
   }
 
   .app-header-nav {

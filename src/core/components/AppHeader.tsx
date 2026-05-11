@@ -10,6 +10,7 @@ import {
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../auth/DummyAuth';
+import logoMuni from '../../assets/logo_municipalidad.png';
 import './AppHeader.css';
 
 /*
@@ -39,7 +40,7 @@ const citizenNavItems = [
 const adminNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
-  { label: 'Mis reportes', path: '/mis-reportes', icon: documentTextOutline },
+  { label: 'Panel Reportes', path: '/admin-reportes', icon: documentTextOutline },
 ];
 
 export function AppHeader() {
@@ -52,7 +53,13 @@ export function AppHeader() {
   return (
     <IonHeader className="app-header">
       <IonToolbar className="app-header-toolbar">
-        <IonTitle>Municipalidad de Santo Domingo</IonTitle>
+        <IonTitle>
+          <div className="app-header-brand">
+            <img src={logoMuni} alt="Logo" className="app-header-logo" />
+            <span className="app-header-title-desktop">Municipalidad de Santo Domingo</span>
+            <span className="app-header-title-mobile">Santo Domingo</span>
+          </div>
+        </IonTitle>
         <IonButtons slot="end">
           <nav className="app-header-nav" aria-label="Navegación principal">
             {navigationItems.map((item) => (

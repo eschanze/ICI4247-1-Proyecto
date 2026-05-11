@@ -1,17 +1,6 @@
-/*
- * MyReportsPage.tsx – RF5: Seguimiento del estado de reportes por el ciudadano.
- *
- * Muestra una lista de todos los reportes creados por el usuario actual,
- * con su estado, urgencia, y la posibilidad de expandir cada uno para ver
- * el detalle completo (descripción, foto, historial de estados, fecha programada).
- *
- * Si el usuario no tiene sesión activa, se le redirige a /login.
- */
-
 import { useEffect, useState } from 'react';
-import { IonBadge,IonButton,IonContent,IonIcon,IonPage,useIonRouter } from '@ionic/react';
+import { IonBadge, IonContent, IonIcon, IonPage, useIonRouter, IonSelect, IonSelectOption, IonItem, IonLabel } from '@ionic/react';
 import {
-  addCircleOutline,
   alertCircleOutline,
   calendarOutline,
   chevronDownOutline,
@@ -22,8 +11,8 @@ import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../../core/auth/DummyAuth';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { Report, ReportStatus } from '../../core/data/ReportContext';
-import './MyReportsPage.css';
+import type { Report, ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
+import '../my-reports/MyReportsPage.css'; // Reutilizamos los estilos de Mis Reportes
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   pendiente: { label: 'Pendiente', color: 'medium' },
@@ -59,12 +48,21 @@ function formatShortDate(isoDate: string): string {
   });
 }
 
-/* ReportCard muestra un reporte individual con opción de expandir/colapsar. */
-function ReportCard({ report }: { report: Report }) {
+/* AdminReportCard muestra un reporte individual con opciones de modificar (RF3). */
+function AdminReportCard({ report }: { report: Report }) {
   const [expanded, setExpanded] = useState(false);
+  const { updateReport } = useReports();
 
   const statusConfig = STATUS_CONFIG[report.status];
   const urgencyColor = URGENCY_COLORS[report.urgency] ?? 'medium';
+
+  const handleStatusChange = (newStatus: ReportStatus) => {
+    updateReport(report.id, { status: newStatus }, 'Cambio de estado por administrador');
+  };
+
+  const handleUrgencyChange = (newUrgency: UrgencyLevel) => {
+    updateReport(report.id, { urgency: newUrgency });
+  };
 
   return (
     <article className="my-report-card">
@@ -79,7 +77,7 @@ function ReportCard({ report }: { report: Report }) {
           <h2 className="my-report-card-street">{report.street}</h2>
           <p className="my-report-card-date">
             <IonIcon icon={timeOutline} aria-hidden="true" />
-            {formatDate(report.createdAt)}
+            {formatDate(report.createdAt)} - Autor: {report.authorUsername}
           </p>
         </div>
 
@@ -98,6 +96,39 @@ function ReportCard({ report }: { report: Report }) {
       {/* Detalle: visible solo cuando está expandido */}
       {expanded && (
         <div className="my-report-card-detail" id={`report-detail-${report.id}`}>
+          {/* Controles de Administrador (RF3) */}
+          <div className="my-report-detail-section" style={{ backgroundColor: 'var(--app-paper)', padding: '16px', border: 'var(--app-border-width) solid var(--app-ink)' }}>
+            <h3>Gestión del Reporte (Admin)</h3>
+            
+            <IonItem lines="none" style={{ '--background': 'transparent' }}>
+              <IonLabel>Estado:</IonLabel>
+              <IonSelect 
+                value={report.status} 
+                onIonChange={e => handleStatusChange(e.detail.value)}
+                interface="popover"
+              >
+                <IonSelectOption value="pendiente">Pendiente</IonSelectOption>
+                <IonSelectOption value="verificado">Verificado</IonSelectOption>
+                <IonSelectOption value="agendado">Agendado</IonSelectOption>
+                <IonSelectOption value="en_proceso">En proceso</IonSelectOption>
+                <IonSelectOption value="resuelto">Resuelto</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+
+            <IonItem lines="none" style={{ '--background': 'transparent' }}>
+              <IonLabel>Urgencia:</IonLabel>
+              <IonSelect 
+                value={report.urgency} 
+                onIonChange={e => handleUrgencyChange(e.detail.value)}
+                interface="popover"
+              >
+                <IonSelectOption value="baja">Baja</IonSelectOption>
+                <IonSelectOption value="media">Media</IonSelectOption>
+                <IonSelectOption value="alta">Alta</IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          </div>
+
           {/* Descripción */}
           <div className="my-report-detail-section">
             <h3>Descripción</h3>
@@ -151,28 +182,27 @@ function ReportCard({ report }: { report: Report }) {
   );
 }
 
-export function MyReportsPage() {
-  usePageTitle('Mis reportes - Programa No+Cables');
+export function AdminReportsPage() {
+  usePageTitle('Administración de Reportes - Programa No+Cables');
 
   const { user } = useDummyAuth();
-  const { getReportsByUser } = useReports();
+  const { reports } = useReports();
   const router = useIonRouter();
   const location = useLocation();
 
-  /* Redirigir si no hay sesión o es funcionario */
+  /* Redirigir si no hay sesión o no es admin */
   useEffect(() => {
-    if (!user && location.pathname === '/mis-reportes') {
-      router.push('/login', 'root');
-    } else if (user?.role === 'funcionario' && location.pathname === '/mis-reportes') {
-      router.push('/admin-reportes', 'root');
+    if ((!user || user.role !== 'funcionario') && location.pathname === '/admin-reportes') {
+      router.push('/inicio', 'root');
     }
   }, [router, user, location.pathname]);
 
-  if (!user) {
+  if (!user || user.role !== 'funcionario') {
     return null;
   }
 
-  const userReports = getReportsByUser(user.username).sort(
+  // Ordenar reportes más recientes primero
+  const allReports = [...reports].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
@@ -183,31 +213,23 @@ export function MyReportsPage() {
           {/* Encabezado de la página */}
           <div className="my-reports-header">
             <div>
-              <p className="login-eyebrow">Programa No+Cables</p>
-              <h1>Mis reportes</h1>
+              <p className="login-eyebrow">Panel de Funcionario</p>
+              <h1>Panel Reportes</h1>
             </div>
-            <IonButton routerLink="/reportar">
-              <IonIcon icon={addCircleOutline} slot="start" />
-              Nuevo reporte
-            </IonButton>
           </div>
 
           {/* Lista de reportes o empty state */}
-          {userReports.length > 0 ? (
+          {allReports.length > 0 ? (
             <div className="my-reports-list">
-              {userReports.map((report) => (
-                <ReportCard key={report.id} report={report} />
+              {allReports.map((report) => (
+                <AdminReportCard key={report.id} report={report} />
               ))}
             </div>
           ) : (
             <section className="my-reports-empty" aria-label="Sin reportes">
               <IonIcon icon={alertCircleOutline} aria-hidden="true" />
-              <h2>No tienes reportes aún</h2>
-              <p>Crea tu primer reporte de cables en desuso para comenzar.</p>
-              <IonButton routerLink="/reportar">
-                <IonIcon icon={addCircleOutline} slot="start" />
-                Crear mi primer reporte
-              </IonButton>
+              <h2>No hay reportes en el sistema</h2>
+              <p>Actualmente no se han ingresado reportes por los ciudadanos.</p>
             </section>
           )}
         </div>

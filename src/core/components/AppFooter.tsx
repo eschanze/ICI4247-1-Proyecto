@@ -24,7 +24,7 @@ const citizenNavItems = [
 const adminNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
-  { label: 'Mis reportes', path: '/mis-reportes', icon: documentTextOutline },
+  { label: 'Panel Reportes', path: '/admin-reportes', icon: documentTextOutline },
 ];
 
 export function AppFooter() {

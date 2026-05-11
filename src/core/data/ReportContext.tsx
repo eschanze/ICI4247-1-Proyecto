@@ -43,13 +43,14 @@ interface ReportContextValue {
   reports: Report[];                                            // todos los reportes almacenados (en la demo, solo en memoria)
   addReport: (data: NewReportData, authorUsername: string) => void;  // crea un reporte nuevo y lo agrega al array
   getReportsByUser: (username: string) => Report[];              // retorna solo los reportes creados por el usuario indicado
+  updateReport: (id: string, updates: Partial<Report>, comment?: string) => void; // actualiza un reporte existente (RF3)
 }
 
 const SEED_REPORTS: Report[] = [
   {
     id: crypto.randomUUID(),
     authorUsername: 'ciudadano',
-    street: 'Av. Libertad 1420',
+    street: 'Av. Florida 6131',
     description: 'Cables colgando a baja altura sobre la vereda. Es un peligro para peatones y ciclistas en la vía.',
     urgency: 'alta',
     photoDataUrl: null,
@@ -64,7 +65,7 @@ const SEED_REPORTS: Report[] = [
   {
     id: crypto.randomUUID(),
     authorUsername: 'ciudadano',
-    street: 'Pasaje Miraflores 78',
+    street: 'Los Pajaritos 245',
     description: 'Cable de telecomunicaciones en desuso apoyado sobre un árbol. Riesgo de caída si hay viento.',
     urgency: 'media',
     photoDataUrl: null,
@@ -111,6 +112,26 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     setReports((prev) => [...prev, newReport]);
   }, []);
 
+  const updateReport = useCallback((id: string, updates: Partial<Report>, comment?: string) => {
+    setReports((prev) =>
+      prev.map((report) => {
+        if (report.id !== id) return report;
+        
+        const updatedReport = { ...report, ...updates };
+        
+        // Si el estado cambia, registrarlo en el historial automáticamente (RF3)
+        if (updates.status && updates.status !== report.status) {
+          updatedReport.statusHistory = [
+            ...report.statusHistory,
+            { status: updates.status, date: new Date().toISOString(), comment },
+          ];
+        }
+        
+        return updatedReport;
+      }),
+    );
+  }, []);
+
   // Memoizamos la función; depende de reports
   const getReportsByUser = useCallback(
     (username: string) => reports.filter((report) => report.authorUsername === username),
@@ -118,7 +139,7 @@ export function ReportProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <ReportContext.Provider value={{ reports, addReport, getReportsByUser }}>
+    <ReportContext.Provider value={{ reports, addReport, getReportsByUser, updateReport }}>
       {children}
     </ReportContext.Provider>
   );
