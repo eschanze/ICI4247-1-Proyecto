@@ -186,38 +186,20 @@ npm run dev
 ```
 
 El frontend quedará disponible en su navegador en `http://localhost:5173`.
-*(Nota: El comando `npm run build` se utiliza únicamente para compilar la versión optimizada para producción).*
+*(Nota: El comando `npm run build` se puede usar para la versión de producción).*
 
 ### Backend
 
-1. Ingresar a la carpeta del backend y crear un entorno virtual para aislar las dependencias:
 ```bash
 cd backend
 python -m venv .venv
-```
-
-2. Activar el entorno virtual:
-- **En Windows:**
-  ```bash
-  .venv\Scripts\activate
-  ```
-- **En macOS/Linux:**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-3. Instalar las librerías necesarias especificadas en el archivo requirements:
-```bash
+.venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-4. Volver a la raíz del proyecto e iniciar el servidor de Flask en modo de desarrollo (debug):
-```bash
 cd ..
 flask --app backend.app:create_app --debug run
 ```
 
-El backend quedará disponible y recibiendo peticiones en `http://localhost:5000/api`.
+Backend queda disponible en `http://localhost:5000/api`.
 
 Endpoint de prueba (se expanderá en EP2):
 
