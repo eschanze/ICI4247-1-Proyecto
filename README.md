@@ -120,7 +120,7 @@ La interfaz se adapta dinámicamente según el rol del usuario autenticado:
 1. El administrador ingresa a `/admin-reportes`.
 2. Visualiza el dashboard con la tabla de incidentes reportados por los ciudadanos.
 3. Identifica un incidente "Pendiente" y selecciona la acción "Actualizar Estado".
-4. Cambia el estado a "En progreso" u "Oculto" (en caso de ser spam).
+4. Cambia el estado a "En progreso".
 5. La vista se actualiza inmediatamente reflejando el cambio en el sistema.
 
 ---
