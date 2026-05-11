@@ -1,19 +1,10 @@
 .app-footer {
-  /* Barra inferior de la app. */
   border-top: var(--app-border-width) solid var(--app-ink);
+  display: none;
 }
 
 .app-footer-toolbar {
   --min-height: 56px;
-}
-
-.app-footer-title {
-  text-align: right;
-}
-
-/* Barra de navegación (solo para versión móvil) */
-.app-footer-mobile-nav {
-  display: none;
 }
 
 .app-footer-nav {
@@ -60,16 +51,8 @@
   --color: var(--app-ink);
 }
 
-/* ─── Media queries ─── */
-
 @media (max-width: 640px) {
-  .app-footer-credits {
-    /* En móvil se oculta la barra de créditos. */
-    display: none;
-  }
-
-  .app-footer-mobile-nav {
-    /* En móvil se muestra la barra de navegación inferior. */
+  .app-footer {
     display: block;
   }
 }

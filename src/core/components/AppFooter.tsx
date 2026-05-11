@@ -1,4 +1,4 @@
-import { IonButton, IonFooter, IonIcon, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonFooter, IonIcon, IonToolbar } from '@ionic/react';
 import { addCircleOutline, documentTextOutline, homeOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../auth/DummyAuth';
@@ -39,14 +39,6 @@ export function AppFooter() {
 
   return (
     <IonFooter className="app-footer">
-      {/* Barra de créditos visible solo en desktop */}
-      <IonToolbar className="app-footer-toolbar app-footer-credits">
-        <IonTitle className="app-footer-title">
-          Proyecto ICI4247-1 2026-1 - Esteban Schanze Cárdenas
-        </IonTitle>
-      </IonToolbar>
-
-      {/* Barra de navegación inferior visible solo en móvil */}
       <IonToolbar className="app-footer-toolbar app-footer-mobile-nav">
         <nav className="app-footer-nav" aria-label="Navegación principal">
           {navigationItems.map((item) => (
