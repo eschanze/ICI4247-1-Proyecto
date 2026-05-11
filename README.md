@@ -169,28 +169,55 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 
 ## Pasos para ejecutar el proyecto
 
+### Prerrequisitos
+- **Node.js** (v18 o superior recomendado)
+- **Python** (3.10 o superior recomendado)
+
 ### Frontend
 
+1. Instalar las dependencias de Node:
 ```bash
 npm install
-npm run dev
-npm run build
 ```
 
-Frontend queda disponible en `http://localhost:5173`.
+2. Iniciar el servidor de desarrollo (con recarga rápida):
+```bash
+npm run dev
+```
+
+El frontend quedará disponible en su navegador en `http://localhost:5173`.
+*(Nota: El comando `npm run build` se utiliza únicamente para compilar la versión optimizada para producción).*
 
 ### Backend
 
+1. Ingresar a la carpeta del backend y crear un entorno virtual para aislar las dependencias:
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+```
+
+2. Activar el entorno virtual:
+- **En Windows:**
+  ```bash
+  .venv\Scripts\activate
+  ```
+- **En macOS/Linux:**
+  ```bash
+  source .venv/bin/activate
+  ```
+
+3. Instalar las librerías necesarias especificadas en el archivo requirements:
+```bash
 pip install -r requirements.txt
+```
+
+4. Volver a la raíz del proyecto e iniciar el servidor de Flask en modo de desarrollo (debug):
+```bash
 cd ..
 flask --app backend.app:create_app --debug run
 ```
 
-Backend queda disponible en `http://localhost:5000/api`.
+El backend quedará disponible y recibiendo peticiones en `http://localhost:5000/api`.
 
 Endpoint de prueba (se expanderá en EP2):
 
