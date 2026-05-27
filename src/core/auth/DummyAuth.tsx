@@ -1,30 +1,26 @@
-/*
- * DummyAuth.tsx – Autenticación simulada para la entrega parcial 1.
- * Para la EP2 este archivo se reemplazará por un AuthContext real.
- */
+// DummyAuth.tsx – Autenticación simulada para la entrega parcial 1.
+// Para la EP2 este archivo se reemplazará por un AuthContext real.
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
-/* Roles posibles dentro del sistema No+Cables. */
+// Roles posibles dentro del sistema No+Cables.
 type UserRole = 'ciudadano' | 'funcionario';
 
-/* Datos del usuario autenticado que se exponen al resto de la app. */
+// Datos del usuario autenticado que se exponen al resto de la app.
 export interface DummyUser {
   username: string;
   role: UserRole;
 }
 
-/* Interfaz que usan los componentes hijos */
+// Interfaz que usan los componentes hijos
 interface DummyAuthContextValue {
-  user: DummyUser | null;                                          // usuario actual o null si no hay sesión activa
-  login: (username: string, password: string) => boolean;          // intenta autenticar; retorna true si las credenciales coinciden
-  logout: () => void;                                              // cierra la sesión actual
+  user: DummyUser | null;
+  login: (username: string, password: string) => boolean;
+  logout: () => void;
 }
 
-/*
- * Lista de credenciales válidas para la demo (entrega parcial 1)
- */
+// Lista de credenciales válidas para la demo (entrega parcial 1)
 const DUMMY_CREDENTIALS: { username: string; password: string; role: UserRole }[] = [
   { username: 'ciudadano', password: 'contra123', role: 'ciudadano' },
   { username: 'admin', password: 'contra123', role: 'funcionario' },
@@ -32,15 +28,12 @@ const DUMMY_CREDENTIALS: { username: string; password: string; role: UserRole }[
 
 const DummyAuthContext = createContext<DummyAuthContextValue | null>(null);
 
-/*
- * DummyAuthProvider envuelve la app y mantiene el estado de sesión.
- * Los componentes hijos acceden al estado via el hook useDummyAuth().
- */
+// DummyAuthProvider envuelve la app y mantiene el estado de sesión.
+// Los componentes hijos acceden al estado via el hook useDummyAuth().
 export function DummyAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<DummyUser | null>(null);
 
-  // Memoizamos login para no romper dependencias en otros componentes
-  const login = useCallback((username: string, password: string): boolean => {
+  const login = (username: string, password: string): boolean => {
     const match = DUMMY_CREDENTIALS.find(
       (cred) => cred.username === username && cred.password === password,
     );
@@ -51,11 +44,11 @@ export function DummyAuthProvider({ children }: { children: ReactNode }) {
     }
 
     return false;
-  }, []);
+  };
 
-  const logout = useCallback(() => {
+  const logout = () => {
     setUser(null);
-  }, []);
+  };
 
   return (
     <DummyAuthContext.Provider value={{ user, login, logout }}>

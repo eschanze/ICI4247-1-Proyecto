@@ -13,30 +13,24 @@ import { useDummyAuth } from '../auth/DummyAuth';
 import logoMuni from '../../assets/logo_municipalidad.png';
 import './AppHeader.css';
 
-/*
- * Links que se muestran cuando NO hay sesión activa.
- * Son las rutas públicas de la app.
- */
+// Links que se muestran cuando NO hay sesión activa.
+// Son las rutas públicas de la app.
 const publicNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Ingresar', path: '/login', icon: logInOutline },
   { label: 'Registrarse', path: '/registro', icon: personAddOutline },
 ];
 
-/*
- * Links que se muestran cuando un ciudadano tiene sesión activa.
- * Reemplaza "Ingresar" y "Registrarse" por las funcionalidades del ciudadano.
- */
+// Links que se muestran cuando un ciudadano tiene sesión activa.
+// Reemplaza "Ingresar" y "Registrarse" por las funcionalidades del ciudadano.
 const citizenNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
   { label: 'Mis reportes', path: '/mis-reportes', icon: documentTextOutline },
 ];
 
-/*
- * Links para el rol funcionario (admin).
- * Por ahora son básicos; se extenderán con el panel de gestión en futuras entregas.
- */
+// Links para el rol funcionario (admin).
+// Por ahora son básicos; se extenderán con el panel de gestión en futuras entregas.
 const adminNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Reportar', path: '/reportar', icon: addCircleOutline },

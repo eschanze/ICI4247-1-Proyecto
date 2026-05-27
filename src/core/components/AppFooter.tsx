@@ -4,11 +4,9 @@ import { useLocation } from 'react-router-dom';
 import { useDummyAuth } from '../auth/DummyAuth';
 import './AppFooter.css';
 
-/*
- * Los mismos items de navegación que usa AppHeader,
- * duplicados aquí para que el footer pueda mostrarlos
- * como barra de navegación inferior en móvil.
- */
+// Los mismos items de navegación que usa AppHeader,
+// duplicados aquí para que el footer pueda mostrarlos
+// como barra de navegación inferior en móvil.
 const publicNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
   { label: 'Ingresar', path: '/login', icon: logInOutline },

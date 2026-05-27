@@ -1,5 +1,5 @@
 .map-content {
-  /* Asegura que el mapa ocupe todo el espacio disponible */
+  /* Quita el padding de Ionic para que el mapa ocupe todo el viewport. */
   --padding-top: 0;
   --padding-end: 0;
   --padding-bottom: 0;
@@ -7,16 +7,17 @@
 }
 
 .map-container {
+  /* Contenedor del iframe de Google Maps. */
   width: 100%;
   height: 100%;
   background: var(--app-surface);
-  /* Solo si el borde no ocupa todo el ancho */
   border-left: var(--app-border-width) solid var(--app-ink);
   border-right: var(--app-border-width) solid var(--app-ink);
   box-sizing: border-box;
 }
 
 .map-container iframe {
+  /* El iframe ocupa todo el espacio del contenedor. */
   display: block;
   width: 100%;
   height: 100%;

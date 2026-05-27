@@ -1,36 +1,36 @@
 // Mantenemos todo en un array de reportes en estado React... 
 // En la EP2 se reemplazará por llamadas al API REST del backend.
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
-/* Niveles de urgencia percibida que puede indicar el ciudadano. */
+// Niveles de urgencia percibida que puede indicar el ciudadano.
 export type UrgencyLevel = 'baja' | 'media' | 'alta';
 
-/* Estados posibles dentro del ciclo de vida de un reporte (RF3). */
+// Estados posibles dentro del ciclo de vida de un reporte (RF3).
 export type ReportStatus = 'pendiente' | 'verificado' | 'agendado' | 'en_proceso' | 'resuelto';
 
-/* Entrada del historial de cambios de estado de un reporte. */
+// Entrada del historial de cambios de estado.
 export interface StatusHistoryEntry {
-  status: ReportStatus;        // estado al que se cambió
-  date: string;                // fecha ISO del cambio
-  comment?: string;            // comentario opcional del funcionario
+  status: ReportStatus;
+  date: string;
+  comment?: string;
 }
 
-/* Estructura completa de un reporte de incidente. */
+// Estructura completa de un reporte.
 export interface Report {
-  id: string;                   // identificador único generado al crear
-  authorUsername: string;       // nombre de usuario del ciudadano que reportó
-  street: string;               // dirección: nombre de calle y número
-  description: string;          // descripción libre del problema
-  urgency: UrgencyLevel;        // urgencia percibida por el ciudadano
-  photoDataUrl: string | null;  // foto adjunta codificada como Data URL, o null si no tiene
-  status: ReportStatus;         // estado actual del reporte
-  createdAt: string;            // fecha de creación en formato ISO
-  scheduledDate: string | null; // fecha programada de retiro (asignada por funcionario)
-  statusHistory: StatusHistoryEntry[]; // historial completo de cambios de estado
+  id: string;
+  authorUsername: string;
+  street: string;
+  description: string;
+  urgency: UrgencyLevel;
+  photoDataUrl: string | null;  // Data URL de la foto adjunta, o null
+  status: ReportStatus;
+  createdAt: string;            // formato ISO
+  scheduledDate: string | null; // asignada por el funcionario
+  statusHistory: StatusHistoryEntry[];
 }
 
-/* Datos que el ciudadano provee al crear un nuevo reporte (sin los campos automáticos). */
+// Datos que el ciudadano provee al crear un nuevo reporte (sin los campos automáticos).
 export interface NewReportData {
   street: string;
   description: string;
@@ -38,12 +38,12 @@ export interface NewReportData {
   photoDataUrl: string | null;
 }
 
-/* Forma del contexto que consumen los componentes. */
+// Forma del contexto que consumen los componentes.
 interface ReportContextValue {
-  reports: Report[];                                            // todos los reportes almacenados (en la demo, solo en memoria)
-  addReport: (data: NewReportData, authorUsername: string) => void;  // crea un reporte nuevo y lo agrega al array
-  getReportsByUser: (username: string) => Report[];              // retorna solo los reportes creados por el usuario indicado
-  updateReport: (id: string, updates: Partial<Report>, comment?: string) => void; // actualiza un reporte existente (RF3)
+  reports: Report[];
+  addReport: (data: NewReportData, authorUsername: string) => void;
+  getReportsByUser: (username: string) => Report[];
+  updateReport: (id: string, updates: Partial<Report>, comment?: string) => void;
 }
 
 const SEED_REPORTS: Report[] = [
@@ -84,14 +84,12 @@ const SEED_REPORTS: Report[] = [
 
 const ReportContext = createContext<ReportContextValue | null>(null);
 
-/*
- * ReportProvider mantiene el estado global de reportes y lo expone a toda la app.
- * En esta versión demo, los datos viven en useState y se pierden al recargar la página.
- */
+// ReportProvider mantiene el estado global de reportes y lo expone a toda la app.
+// En esta versión demo, los datos viven en useState y se pierden al recargar la página.
 export function ReportProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
 
-  const addReport = useCallback((data: NewReportData, authorUsername: string) => {
+  const addReport = (data: NewReportData, authorUsername: string) => {
     const now = new Date().toISOString();
 
     const newReport: Report = {
@@ -110,9 +108,9 @@ export function ReportProvider({ children }: { children: ReactNode }) {
     // setReports recibe una función (prev => [...prev, newReport]) en vez de un valor directo.
     // Garantiza que siempre trabajamos con el estado más reciente.
     setReports((prev) => [...prev, newReport]);
-  }, []);
+  };
 
-  const updateReport = useCallback((id: string, updates: Partial<Report>, comment?: string) => {
+  const updateReport = (id: string, updates: Partial<Report>, comment?: string) => {
     setReports((prev) =>
       prev.map((report) => {
         if (report.id !== id) return report;
@@ -130,13 +128,9 @@ export function ReportProvider({ children }: { children: ReactNode }) {
         return updatedReport;
       }),
     );
-  }, []);
+  };
 
-  // Memoizamos la función; depende de reports
-  const getReportsByUser = useCallback(
-    (username: string) => reports.filter((report) => report.authorUsername === username),
-    [reports],
-  );
+  const getReportsByUser = (username: string) => reports.filter((report) => report.authorUsername === username);
 
   return (
     <ReportContext.Provider value={{ reports, addReport, getReportsByUser, updateReport }}>

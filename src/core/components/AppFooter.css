@@ -1,13 +1,16 @@
 .app-footer {
+  /* Barra inferior de la app. Solo visible en móvil. */
   border-top: var(--app-border-width) solid var(--app-ink);
   display: none;
 }
 
 .app-footer-toolbar {
+  /* Toolbar base del footer. */
   --min-height: 56px;
 }
 
 .app-footer-nav {
+  /* Contenedor de los botones de navegación inferior. */
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -16,6 +19,7 @@
 }
 
 .app-footer-nav-link {
+  /* Botón individual de la barra de navegación inferior. */
   --border-radius: 0;
   --box-shadow: none;
   --padding-start: 4px;
@@ -30,6 +34,7 @@
 }
 
 .app-footer-nav-link-inner {
+  /* Layout vertical para ícono + label dentro de cada botón. */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,21 +42,25 @@
 }
 
 .app-footer-nav-link-inner ion-icon {
+  /* Ícono de navegación. */
   font-size: 1.5rem;
 }
 
 .app-footer-nav-link-inner span {
+  /* Label bajo el ícono. */
   font-size: 0.7rem;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .app-footer-nav-link.active {
+  /* Estado visual para la ruta actualmente activa. */
   --background: rgba(var(--ion-color-primary-rgb), 0.18);
   --color: var(--app-ink);
 }
 
 @media (max-width: 640px) {
+  /* En móvil el footer se muestra como barra de navegación inferior. */
   .app-footer {
     display: block;
   }

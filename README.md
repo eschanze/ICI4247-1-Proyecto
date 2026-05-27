@@ -146,19 +146,19 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
   - Cuadrículas (Grids) de 2 o 3 columnas para estadísticas o listas de reportes.
 - **Escritorio (Desktop):**
   - Aprovechamiento total del espacio horizontal con márgenes laterales amplios.
-  - Se oculta el Footer (ya que no es necesaria la barra de navegación móvil)
+  - Se oculta el Footer (ya que no es necesaria la barra de navegación móvil).
   - Efectos hover para elementos interactivos (botones, enlaces), lo cual intenta replicar la retroalimentación que es posible con pantalla táctil.
 
 ---
 
 ### (h) Breve justificación técnica de las decisiones adoptadas
 
-- **Usabilidad y Claridad Estructural:** Se optó por una arquitectura plana y componentes de navegación siempre visibles (Header) para simplificar la experiencia. El usuario siempre sabe dónde está y cómo volver. El diseño con bordes marcados, sombras sólidas y alto contraste favorece la legibilidad y deja claros cuales son los elementos interactivos.
+- **Usabilidad y Claridad Estructural:** Se optó por una arquitectura plana y componentes de navegación siempre visibles (Header) para simplificar la experiencia. El usuario siempre sabe dónde está y cómo volver. El diseño con bordes marcados, sombras sólidas y alto contraste favorece la legibilidad y deja claros cuáles son los elementos interactivos.
 - **Eficiencia de Interacción:** En lugar de recargar la página completa, el uso de React Router y `IonRouterOutlet` permite transiciones casi instantáneas, simulando el rendimiento de una aplicación nativa.
 - **Escalabilidad de la Arquitectura Frontend:** 
-  - **CSS Centralizado:** El uso de un sistema de variables globales (`index.css`) permite escalar y mantener el tema visual de manera muy sencilla. No se usaron frameworks de utilidades abusivos para mantener el HTML limpio.
+  - **CSS Centralizado:** El uso de un sistema de variables globales (`index.css`) permite escalar y mantener el tema visual de manera muy sencilla. No se usaron frameworks de utilidades para mantener el HTML lo más limpio posible.
   - **Context API:** Para los requerimientos actuales (estado de usuario y reportes en memoria), se utilizó React Context (`ReportContext` y `DummyAuth`) en lugar de librerías pesadas. Esto será reemplazado para la siguiente entrega, donde se integrará el backend.
-  - **Componentización:** Se utilizó la estructura de carpetas sugerida por el profesor en calses. Se separaron las vistas por "Features" (ej. `/features/report/`, `/features/map/`) agrupando su lógica, vista y estilos. Esto facilita encontrar, modificar y probar componentes de forma aislada a medida que el proyecto crece.
+  - **Componentización:** Se utilizó la estructura de carpetas sugerida por el profesor en clases. Se separaron las vistas por "Features" (ej. `/features/report/`, `/features/map/`) agrupando su lógica, vista y estilos. Esto facilita encontrar, modificar y probar componentes de forma aislada a medida que el proyecto crece.
 
 ---
 
@@ -200,7 +200,7 @@ flask --app backend.app:create_app --debug run
 
 Backend queda disponible en `http://localhost:5000/api`.
 
-Endpoint de prueba (se expanderá en EP2):
+Endpoint de prueba (se expandirá en EP2):
 
 ```bash
 GET http://localhost:5000/api/health

@@ -1,3 +1,12 @@
+/*
+ * AdminReportsPage.tsx – RF3: Gestión y triage de reportes por el funcionario.
+ *
+ * Panel que permite al funcionario ver todos los reportes del sistema,
+ * cambiar su estado y nivel de urgencia, y revisar el historial de cada caso.
+ *
+ * Si el usuario no tiene sesión activa o no es funcionario, se le redirige a /inicio.
+ */
+
 import { useEffect, useState } from 'react';
 import { IonBadge, IonContent, IonIcon, IonPage, useIonRouter, IonSelect, IonSelectOption, IonItem, IonLabel } from '@ionic/react';
 import {
@@ -12,8 +21,9 @@ import { useDummyAuth } from '../../core/auth/DummyAuth';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { Report, ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
-import '../my-reports/MyReportsPage.css'; // Reutilizamos los estilos de Mis Reportes
+import '../my-reports/MyReportsPage.css'; // Reutilizamos los estilos de "Mis Reportes"
 
+// Configuración de etiquetas y colores para cada estado de reporte.
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   pendiente: { label: 'Pendiente', color: 'medium' },
   verificado: { label: 'Verificado', color: 'primary' },
@@ -22,13 +32,15 @@ const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   resuelto: { label: 'Resuelto', color: 'success' },
 };
 
-/* Mapea nivel de urgencia a un color Ionic para los badges. */
+// Mapea nivel de urgencia a un color Ionic para los badges.
 const URGENCY_COLORS: Record<string, string> = {
   baja: 'success',
   media: 'warning',
   alta: 'danger',
 };
 
+// Función helper para mostrar fechas en formato largo. 
+// Ej: "28 de abril de 2026".
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
     year: 'numeric',
@@ -37,7 +49,8 @@ function formatDate(isoDate: string): string {
   });
 }
 
-/* Variante corta de formato de fecha para el historial. */
+// Función helper para mostrar fechas en formato corto dentro del historial de estados. 
+// Ej: "28 Abr 2026, 10:15".
 function formatShortDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
     year: 'numeric',
@@ -48,7 +61,7 @@ function formatShortDate(isoDate: string): string {
   });
 }
 
-/* AdminReportCard muestra un reporte individual con opciones de modificar (RF3). */
+// AdminReportCard muestra un reporte individual (con la opción de modificar estado y urgencia)
 function AdminReportCard({ report }: { report: Report }) {
   const [expanded, setExpanded] = useState(false);
   const { updateReport } = useReports();
@@ -182,6 +195,7 @@ function AdminReportCard({ report }: { report: Report }) {
   );
 }
 
+// Página principal de administración de reportes, accesible solo para funcionarios (RF3).
 export function AdminReportsPage() {
   usePageTitle('Administración de Reportes - Programa No+Cables');
 
@@ -190,7 +204,7 @@ export function AdminReportsPage() {
   const router = useIonRouter();
   const location = useLocation();
 
-  /* Redirigir si no hay sesión o no es admin */
+  // Redirigir si no hay sesión o no es admin
   useEffect(() => {
     if ((!user || user.role !== 'funcionario') && location.pathname === '/admin-reportes') {
       router.push('/inicio', 'root');
