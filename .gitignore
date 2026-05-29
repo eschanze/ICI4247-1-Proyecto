@@ -9,4 +9,6 @@ __pycache__/
 venv/
 .env
 instance/
-.agents/
+# Notas personales y documentación incompleta / drafts para el README
+EP2.md
+docs/

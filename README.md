@@ -165,13 +165,13 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 # Stack
 
 **Frontend:** Ionic con React y TypeScript, empaquetado con Vite  
-**Backend:** Flask (Python)
+**Backend:** Node.js con Express
 
 ## Pasos para ejecutar el proyecto
 
 ### Prerrequisitos
 - **Node.js** (v18 o superior recomendado)
-- **Python** (3.10 o superior recomendado)
+- **PostgreSQL** (para la integración de la BBDD de la EP2)
 
 ### Frontend
 
@@ -191,17 +191,22 @@ El frontend quedará disponible en su navegador en `http://localhost:5173`. El c
 
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-cd ..
-flask --app backend.app:create_app --debug run
+npm install
+npm run dev
 ```
 
 Backend queda disponible en `http://localhost:5000/api`.
 
-Endpoint de prueba (se expandirá en EP2):
+Endpoints de prueba:
 
 ```bash
 GET http://localhost:5000/api/health
+GET http://localhost:5000/api/db-health
+```
+
+Para inicializar las tablas de PostgreSQL, renombrar `backend/.env.example` a `backend/.env`, editar `DATABASE_URL`, y ejecutar:
+
+```bash
+cd backend
+npm run db:init
 ```
