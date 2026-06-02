@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 
 import { env } from './config/env.js';
+import { authRouter } from './routes/auth.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 
 // Función principal para crear la aplicación Express
@@ -15,6 +16,7 @@ export function createApp() {
 
   // Ruta de salud para verificar que el servidor está funcionando correctamente
   app.use('/api', healthRouter);
+  app.use('/api/auth', authRouter);
 
   // Manejo de rutas no encontradas (404) y errores generales (500)
   app.use((req, res) => {
