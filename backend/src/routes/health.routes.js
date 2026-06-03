@@ -16,7 +16,7 @@ healthRouter.get('/health', (req, res) => {
 
 healthRouter.get('/db-health', async (req, res) => {
   try {
-    // Hacemos una consulta liviana para confirmar que PostgreSQL responde.
+    // Hacemos una consulta liviana para confirmar que PostgreSQL responde
     const result = await pool.query('SELECT NOW() AS checked_at');
 
     res.json({

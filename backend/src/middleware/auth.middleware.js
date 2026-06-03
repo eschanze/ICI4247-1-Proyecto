@@ -17,7 +17,7 @@ export function requireAuth(req, res, next) {
   try {
     const payload = jwt.verify(token, env.jwtSecret);
 
-    // Guardamos los datos mínimos del token para usarlos en rutas protegidas.
+    // Guardamos los datos mínimos del token para usarlos en rutas protegidas
     req.user = {
       id: payload.id,
       username: payload.username,
@@ -34,7 +34,7 @@ export function requireAuth(req, res, next) {
 }
 
 export function requireFuncionario(req, res, next) {
-  // Solo los funcionarios pueden ejecutar acciones administrativas.
+  // Solo los funcionarios pueden ejecutar acciones administrativas
   if (req.user?.role !== 'funcionario') {
     return res.status(403).json({
       data: null,

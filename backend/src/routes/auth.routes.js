@@ -12,7 +12,7 @@ const MIN_PASSWORD_LENGTH = 6;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function createToken(user) {
-  // Incluimos solo los datos necesarios para identificar sesión y permisos.
+  // Incluimos solo los datos necesarios para identificar sesión y permisos
   return jwt.sign(
     {
       id: user.id,
@@ -25,7 +25,7 @@ function createToken(user) {
 }
 
 function publicUser(row) {
-  // Nunca devolvemos password_hash en respuestas de la API.
+  // Nunca devolvemos password_hash en respuestas de la API
   return {
     id: row.id,
     username: row.username,
@@ -81,7 +81,7 @@ authRouter.post('/register', async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(input.password, 10);
 
-    // El registro público siempre crea ciudadanos; los funcionarios se crean de forma controlada.
+    // El registro público siempre crea ciudadanos; los funcionarios se crean de forma controlada
     const result = await pool.query(
       `
         INSERT INTO users (username, email, password_hash, role)
