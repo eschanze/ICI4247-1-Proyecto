@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { IonBadge, IonContent, IonIcon, IonPage, useIonRouter, IonSelect, IonSelectOption, IonItem, IonLabel } from '@ionic/react';
+import { IonBadge, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonSelect, IonSelectOption, useIonRouter, useIonToast } from '@ionic/react';
 import {
   alertCircleOutline,
   calendarOutline,
@@ -18,9 +18,10 @@ import {
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
-import { useReports } from '../../core/data/ReportContext';
+import { getAllReports, updateReport as updateReportApi } from '../../core/api/reportsApi';
+import type { ApiReport } from '../../core/api/reportsApi';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { Report, ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
+import type { ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
 import '../my-reports/MyReportsPage.css'; // Reutilizamos los estilos de "Mis Reportes"
 
 // Configuración de etiquetas y colores para cada estado de reporte.
@@ -39,7 +40,7 @@ const URGENCY_COLORS: Record<string, string> = {
   alta: 'danger',
 };
 
-// Función helper para mostrar fechas en formato largo. 
+// Función helper para mostrar fechas en formato largo.
 // Ej: "28 de abril de 2026".
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
@@ -49,7 +50,7 @@ function formatDate(isoDate: string): string {
   });
 }
 
-// Función helper para mostrar fechas en formato corto dentro del historial de estados. 
+// Función helper para mostrar fechas en formato corto dentro del historial de estados.
 // Ej: "28 Abr 2026, 10:15".
 function formatShortDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
@@ -62,19 +63,41 @@ function formatShortDate(isoDate: string): string {
 }
 
 // AdminReportCard muestra un reporte individual (con la opción de modificar estado y urgencia)
-function AdminReportCard({ report }: { report: Report }) {
+function AdminReportCard({
+  report,
+  onReportUpdated,
+}: {
+  report: ApiReport;
+  onReportUpdated: (updated: ApiReport) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
-  const { updateReport } = useReports();
+  const { token } = useAuth();
+  const [presentToast] = useIonToast();
 
   const statusConfig = STATUS_CONFIG[report.status];
   const urgencyColor = URGENCY_COLORS[report.urgency] ?? 'medium';
 
-  const handleStatusChange = (newStatus: ReportStatus) => {
-    updateReport(report.id, { status: newStatus }, 'Cambio de estado por administrador');
+  const handleStatusChange = async (newStatus: ReportStatus) => {
+    if (newStatus === report.status) return;
+    try {
+      const res = await updateReportApi(token!, String(report.id), {
+        status: newStatus,
+        comment: 'Cambio de estado por administrador.',
+      });
+      onReportUpdated(res.report);
+    } catch {
+      presentToast({ message: 'No se pudo actualizar el estado.', duration: 3000, position: 'top', color: 'danger' });
+    }
   };
 
-  const handleUrgencyChange = (newUrgency: UrgencyLevel) => {
-    updateReport(report.id, { urgency: newUrgency });
+  const handleUrgencyChange = async (newUrgency: UrgencyLevel) => {
+    if (newUrgency === report.urgency) return;
+    try {
+      const res = await updateReportApi(token!, String(report.id), { urgency: newUrgency });
+      onReportUpdated(res.report);
+    } catch {
+      presentToast({ message: 'No se pudo actualizar la urgencia.', duration: 3000, position: 'top', color: 'danger' });
+    }
   };
 
   return (
@@ -112,11 +135,11 @@ function AdminReportCard({ report }: { report: Report }) {
           {/* Controles de Administrador (RF3) */}
           <div className="my-report-detail-section" style={{ backgroundColor: 'var(--app-paper)', padding: '16px', border: 'var(--app-border-width) solid var(--app-ink)' }}>
             <h3>Gestión del Reporte (Admin)</h3>
-            
+
             <IonItem lines="none" style={{ '--background': 'transparent' }}>
               <IonLabel>Estado:</IonLabel>
-              <IonSelect 
-                value={report.status} 
+              <IonSelect
+                value={report.status}
                 onIonChange={e => handleStatusChange(e.detail.value)}
                 interface="popover"
               >
@@ -130,8 +153,8 @@ function AdminReportCard({ report }: { report: Report }) {
 
             <IonItem lines="none" style={{ '--background': 'transparent' }}>
               <IonLabel>Urgencia:</IonLabel>
-              <IonSelect 
-                value={report.urgency} 
+              <IonSelect
+                value={report.urgency}
                 onIonChange={e => handleUrgencyChange(e.detail.value)}
                 interface="popover"
               >
@@ -149,11 +172,11 @@ function AdminReportCard({ report }: { report: Report }) {
           </div>
 
           {/* Foto adjunta, si existe */}
-          {report.photoDataUrl && (
+          {report.photoUrl && (
             <div className="my-report-detail-section">
               <h3>Foto adjunta</h3>
               <div className="my-report-detail-photo">
-                <img src={report.photoDataUrl} alt="Foto del incidente reportado" />
+                <img src={report.photoUrl} alt="Foto del incidente reportado" />
               </div>
             </div>
           )}
@@ -199,8 +222,10 @@ function AdminReportCard({ report }: { report: Report }) {
 export function AdminReportsPage() {
   usePageTitle('Administración de Reportes - Programa No+Cables');
 
-  const { user, isLoading } = useAuth();
-  const { reports } = useReports();
+  const { user, isLoading, token } = useAuth();
+  const [presentToast] = useIonToast();
+  const [reports, setReports] = useState<ApiReport[]>([]);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
   const router = useIonRouter();
   const location = useLocation();
 
@@ -217,6 +242,24 @@ export function AdminReportsPage() {
     }
   }, [router, user, isLoading, location.pathname]);
 
+  // Se cargan los reportes del sistema cuando la sesión está lista
+  useEffect(() => {
+    if (isLoading || !token || !user || user.role !== 'funcionario') return;
+
+    setIsLoadingReports(true);
+    getAllReports(token)
+      .then((res) => setReports(res.reports))
+      .catch(() =>
+        presentToast({
+          message: 'No se pudieron cargar los reportes.',
+          duration: 3000,
+          position: 'top',
+          color: 'danger',
+        }),
+      )
+      .finally(() => setIsLoadingReports(false));
+  }, [token, isLoading]);
+
   if (isLoading || !user || user.role !== 'funcionario') {
     return null;
   }
@@ -225,6 +268,11 @@ export function AdminReportsPage() {
   const allReports = [...reports].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+
+  function handleReportUpdated(updated: ApiReport) {
+    // Reemplazamos solo el reporte modificado para no perder el estado expandido del resto
+    setReports((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+  }
 
   return (
     <IonPage>
@@ -239,10 +287,14 @@ export function AdminReportsPage() {
           </div>
 
           {/* Lista de reportes o empty state */}
-          {allReports.length > 0 ? (
+          {isLoadingReports ? (
+            <section className="my-reports-empty" aria-label="Cargando">
+              <p>Cargando reportes...</p>
+            </section>
+          ) : allReports.length > 0 ? (
             <div className="my-reports-list">
               {allReports.map((report) => (
-                <AdminReportCard key={report.id} report={report} />
+                <AdminReportCard key={report.id} report={report} onReportUpdated={handleReportUpdated} />
               ))}
             </div>
           ) : (

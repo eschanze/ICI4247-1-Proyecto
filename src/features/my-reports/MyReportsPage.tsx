@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { IonBadge,IonButton,IonContent,IonIcon,IonPage,useIonRouter } from '@ionic/react';
+import { IonBadge, IonButton, IonContent, IonIcon, IonPage, useIonRouter, useIonToast } from '@ionic/react';
 import {
   addCircleOutline,
   alertCircleOutline,
@@ -20,9 +20,10 @@ import {
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
-import { useReports } from '../../core/data/ReportContext';
+import { getMyReports } from '../../core/api/reportsApi';
+import type { ApiReport } from '../../core/api/reportsApi';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { Report, ReportStatus } from '../../core/data/ReportContext';
+import type { ReportStatus } from '../../core/data/ReportContext';
 import './MyReportsPage.css';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
@@ -33,7 +34,7 @@ const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   resuelto: { label: 'Resuelto', color: 'success' },
 };
 
-/* Mapea nivel de urgencia a un color Ionic para los badges. */
+// Mapeamos nivel de urgencia a un color Ionic para los badges
 const URGENCY_COLORS: Record<string, string> = {
   baja: 'success',
   media: 'warning',
@@ -48,7 +49,7 @@ function formatDate(isoDate: string): string {
   });
 }
 
-/* Variante corta de formato de fecha para el historial. */
+// Variante corta de formato de fecha para el historial
 function formatShortDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
     year: 'numeric',
@@ -59,8 +60,8 @@ function formatShortDate(isoDate: string): string {
   });
 }
 
-/* ReportCard muestra un reporte individual con opción de expandir/colapsar. */
-function ReportCard({ report }: { report: Report }) {
+// ReportCard muestra un reporte individual con opción de expandir/colapsar
+function ReportCard({ report }: { report: ApiReport }) {
   const [expanded, setExpanded] = useState(false);
 
   const statusConfig = STATUS_CONFIG[report.status];
@@ -105,11 +106,11 @@ function ReportCard({ report }: { report: Report }) {
           </div>
 
           {/* Foto adjunta, si existe */}
-          {report.photoDataUrl && (
+          {report.photoUrl && (
             <div className="my-report-detail-section">
               <h3>Foto adjunta</h3>
               <div className="my-report-detail-photo">
-                <img src={report.photoDataUrl} alt="Foto del incidente reportado" />
+                <img src={report.photoUrl} alt="Foto del incidente reportado" />
               </div>
             </div>
           )}
@@ -154,12 +155,14 @@ function ReportCard({ report }: { report: Report }) {
 export function MyReportsPage() {
   usePageTitle('Mis reportes - Programa No+Cables');
 
-  const { user, isLoading } = useAuth();
-  const { getReportsByUser } = useReports();
+  const { user, isLoading, token } = useAuth();
+  const [presentToast] = useIonToast();
+  const [reports, setReports] = useState<ApiReport[]>([]);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
   const router = useIonRouter();
   const location = useLocation();
 
-  /* Redirigir si no hay sesión o es funcionario */
+  // Redirigir si no hay sesión o es funcionario
   useEffect(() => {
     if (isLoading || location.pathname !== '/mis-reportes') {
       return;
@@ -172,11 +175,29 @@ export function MyReportsPage() {
     }
   }, [router, user, isLoading, location.pathname]);
 
+  // Cargamos los reportes del ciudadano cuando la sesión está lista
+  useEffect(() => {
+    if (isLoading || !token || !user || user.role === 'funcionario') return;
+
+    setIsLoadingReports(true);
+    getMyReports(token)
+      .then((res) => setReports(res.reports))
+      .catch(() =>
+        presentToast({
+          message: 'No se pudieron cargar tus reportes.',
+          duration: 3000,
+          position: 'top',
+          color: 'danger',
+        }),
+      )
+      .finally(() => setIsLoadingReports(false));
+  }, [token, isLoading]);
+
   if (isLoading || !user || user.role === 'funcionario') {
     return null;
   }
 
-  const userReports = getReportsByUser(user.username).sort(
+  const userReports = [...reports].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
@@ -197,7 +218,11 @@ export function MyReportsPage() {
           </div>
 
           {/* Lista de reportes o empty state */}
-          {userReports.length > 0 ? (
+          {isLoadingReports ? (
+            <section className="my-reports-empty" aria-label="Cargando">
+              <p>Cargando reportes...</p>
+            </section>
+          ) : userReports.length > 0 ? (
             <div className="my-reports-list">
               {userReports.map((report) => (
                 <ReportCard key={report.id} report={report} />

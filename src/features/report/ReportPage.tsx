@@ -24,7 +24,7 @@ import {
 import { cameraOutline, closeCircleOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
-import { useReports } from '../../core/data/ReportContext';
+import { createReport } from '../../core/api/reportsApi';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { UrgencyLevel } from '../../core/data/ReportContext';
 import './ReportPage.css';
@@ -32,8 +32,7 @@ import './ReportPage.css';
 export function ReportPage() {
   usePageTitle('Reportar incidente - Programa No+Cables');
 
-  const { user, isLoading } = useAuth();
-  const { addReport } = useReports();
+  const { user, isLoading, token } = useAuth();
 
   const router = useIonRouter();
   const location = useLocation();
@@ -45,6 +44,7 @@ export function ReportPage() {
   const [urgency, setUrgency] = useState<UrgencyLevel>('media');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ street?: string; description?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -64,8 +64,6 @@ export function ReportPage() {
     return null;
   }
 
-  const currentUsername = user.username;
-
   function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -77,7 +75,7 @@ export function ReportPage() {
     reader.readAsDataURL(file);
   }
 
-  /* Elimina la foto seleccionada y resetea el input de archivos. */
+  // Eliminamos la foto seleccionada y reseteamos el input de archivos
   function removePhoto() {
     setPhotoPreview(null);
     if (fileInputRef.current) {
@@ -85,9 +83,8 @@ export function ReportPage() {
     }
   }
 
-  /* Valida y envía el formulario. */
-  function handleSubmit() {
-    // Validación: dirección y descripción son obligatorias.
+  // Validamos y enviamos el formulario al backend
+  async function handleSubmit() {
     const newErrors: { street?: string; description?: string } = {};
 
     if (!street.trim()) {
@@ -103,25 +100,34 @@ export function ReportPage() {
     }
 
     setErrors({});
+    setIsSubmitting(true);
 
-    addReport(
-      {
+    try {
+      await createReport(token!, {
         street: street.trim(),
         description: description.trim(),
         urgency,
-        photoDataUrl: photoPreview,
-      },
-      currentUsername,
-    );
+        photoUrl: photoPreview,
+      });
 
-    presentToast({
-      message: '¡Reporte creado exitosamente!',
-      duration: 2500,
-      position: 'top',
-      color: 'success',
-    });
+      presentToast({
+        message: '¡Reporte creado exitosamente!',
+        duration: 2500,
+        position: 'top',
+        color: 'success',
+      });
 
-    router.push('/mis-reportes', 'forward');
+      router.push('/mis-reportes', 'forward');
+    } catch {
+      presentToast({
+        message: 'No se pudo crear el reporte. Intenta nuevamente.',
+        duration: 3000,
+        position: 'top',
+        color: 'danger',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -226,7 +232,7 @@ export function ReportPage() {
             </div>
           </div>
 
-          <IonButton className="login-submit" expand="block" onClick={handleSubmit}>
+          <IonButton className="login-submit" expand="block" onClick={handleSubmit} disabled={isSubmitting}>
             Enviar reporte
           </IonButton>
         </section>

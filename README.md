@@ -113,8 +113,8 @@ La interfaz se adapta dinámicamente según el rol del usuario autenticado:
 2. Se renderiza el `ReportPage`.
 3. El usuario interactúa con el formulario: ingresa título, descripción, ubicación y adjunta una imagen de evidencia.
 4. Hace clic en "Enviar Reporte".
-5. El sistema valida los datos y guarda el reporte en el `ReportContext` de frontend. El backend ya tiene endpoints reales para reportes, pero estas pantallas aún no reemplazan completamente el estado en memoria.
-6. El usuario es redirigido a `/mis-reportes` o ve un mensaje de éxito, cerrando el ciclo de la tarea.
+5. El sistema valida los datos y envía el reporte al backend mediante `POST /api/reports`.
+6. El usuario es redirigido a `/mis-reportes` o ve un mensaje de error si falla la API, cerrando el ciclo de la tarea.
 
 **Tarea Secundaria: Gestión administrativa de un reporte**
 1. El administrador ingresa a `/admin-reportes`.
@@ -157,7 +157,7 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 - **Eficiencia de Interacción:** En lugar de recargar la página completa, el uso de React Router y `IonRouterOutlet` permite transiciones casi instantáneas, simulando el rendimiento de una aplicación nativa.
 - **Escalabilidad de la Arquitectura Frontend:** 
   - **CSS Centralizado:** El uso de un sistema de variables globales (`index.css`) permite escalar y mantener el tema visual de manera muy sencilla. No se usaron frameworks de utilidades para mantener el HTML lo más limpio posible.
-  - **Context API:** La autenticación usa `AuthContext` con JWT entregado por el backend y persistido en `localStorage`. Los reportes aún usan `ReportContext` en memoria en las pantallas principales, aunque ya existe cliente API para conectar los endpoints reales de reportes.
+  - **Context API:** La autenticación usa `AuthContext` con JWT entregado por el backend y persistido en `localStorage`. Los reportes usan `reportsApi.ts` para conectar con los endpoints reales del backend (`POST /api/reports`, `GET /api/reports/my`, `GET /api/reports`, `PATCH /api/reports/:id`).
   - **Componentización:** Se utilizó la estructura de carpetas sugerida por el profesor en clases. Se separaron las vistas por "Features" (ej. `/features/report/`, `/features/map/`) agrupando su lógica, vista y estilos. Esto facilita encontrar, modificar y probar componentes de forma aislada a medida que el proyecto crece.
 
 ---
