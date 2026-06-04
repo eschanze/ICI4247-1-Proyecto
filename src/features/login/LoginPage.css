@@ -136,19 +136,6 @@
   margin-top: 4px;
 }
 
-.login-demo-hint {
-  /* Caja que muestra las credenciales de demo. */
-  background: rgba(var(--ion-color-primary-rgb), 0.08);
-  border: 1px dashed var(--app-ink);
-  font-size: 0.82rem;
-  padding: 10px 14px;
-  text-align: center;
-}
-
-.login-demo-hint p {
-  margin: 2px 0;
-}
-
 @media (max-width: 480px) {
   /* Ajuste para pantallas móviles. */
   .login-card {

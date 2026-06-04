@@ -157,10 +157,119 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 - **Eficiencia de Interacción:** En lugar de recargar la página completa, el uso de React Router y `IonRouterOutlet` permite transiciones casi instantáneas, simulando el rendimiento de una aplicación nativa.
 - **Escalabilidad de la Arquitectura Frontend:** 
   - **CSS Centralizado:** El uso de un sistema de variables globales (`index.css`) permite escalar y mantener el tema visual de manera muy sencilla. No se usaron frameworks de utilidades para mantener el HTML lo más limpio posible.
-  - **Context API:** La autenticación usa `AuthContext` con JWT entregado por el backend y persistido en `localStorage`. Los reportes usan `reportsApi.ts` para conectar con los endpoints reales del backend (`POST /api/reports`, `GET /api/reports/my`, `GET /api/reports`, `PATCH /api/reports/:id`).
+  - **Context API:** La autenticación usa `AuthContext` con JWT entregado por el backend y persiste en `localStorage`. Los reportes usan `reportsApi.ts` para conectar con los endpoints reales del backend (`POST /api/reports`, `GET /api/reports/my`, `GET /api/reports`, `PATCH /api/reports/:id`).
   - **Componentización:** Se utilizó la estructura de carpetas sugerida por el profesor en clases. Se separaron las vistas por "Features" (ej. `/features/report/`, `/features/map/`) agrupando su lógica, vista y estilos. Esto facilita encontrar, modificar y probar componentes de forma aislada a medida que el proyecto crece.
 
 ---
+
+## EP 2: Implementación backend e integración
+
+### EP 2.1: Creación del servidor backend
+
+Se creó un servidor Node.js con Express dentro de la carpeta `backend/`. La estructura de la aplicación en `backend/src/app.js` (configuración de Express, CORS, parseo JSON, y montaje de rutas) y `backend/src/server.js` (inicio del proceso). Las variables de entorno se centralizan en `backend/src/config/env.js` y se cargan desde un archivo `.env`. El servidor expone sus rutas bajo el prefijo `/api` y queda disponible en `http://localhost:5000/api`. Incluye manejo genérico de rutas no encontradas (404) y manejo de errores (500) que devuelven JSON consistente.
+
+### EP 2.2: Base de datos relacional
+
+Se integró PostgreSQL mediante el driver `pg`. La conexión se gestiona a través de un pool en `backend/src/db/pool.js`, y el esquema se define en `backend/src/db/schema.sql`, ejecutable con el script `npm run db:init` (que corre `backend/src/db/init-db.js`).
+
+El modelo relacional contempla tres tablas:
+
+**Tabla `users`**: usuarios del sistema (ciudadanos y funcionarios):
+
+| Columna | Tipo | Restricciones |
+| --- | --- | --- |
+| `id` | SERIAL | PRIMARY KEY |
+| `username` | VARCHAR(50) | NOT NULL, UNIQUE |
+| `rut` | VARCHAR(12) | NOT NULL, UNIQUE |
+| `email` | VARCHAR(120) | NOT NULL, UNIQUE |
+| `password_hash` | TEXT | NOT NULL |
+| `role` | VARCHAR(20) | NOT NULL, CHECK (`ciudadano`, `funcionario`) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Tabla `reports`**: reportes de cables en desuso creados por ciudadanos:
+
+| Columna | Tipo | Restricciones |
+| --- | --- | --- |
+| `id` | SERIAL | PRIMARY KEY |
+| `user_id` | INTEGER | NOT NULL, FK → users(id) ON DELETE CASCADE |
+| `street` | VARCHAR(160) | NOT NULL |
+| `description` | TEXT | NOT NULL |
+| `urgency` | VARCHAR(20) | NOT NULL, CHECK (`baja`, `media`, `alta`) |
+| `status` | VARCHAR(20) | NOT NULL, DEFAULT `pendiente`, CHECK (`pendiente`, `verificado`, `agendado`, `en_proceso`, `resuelto`) |
+| `scheduled_date` | DATE | Nullable |
+| `photo_url` | TEXT | Nullable |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+| `updated_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+**Tabla `report_status_history`**: historial de cambios de estado de cada reporte
+
+| Columna | Tipo | Restricciones |
+| --- | --- | --- |
+| `id` | SERIAL | PRIMARY KEY |
+| `report_id` | INTEGER | NOT NULL, FK → reports(id) ON DELETE CASCADE |
+| `status` | VARCHAR(20) | NOT NULL, CHECK (`pendiente`, `verificado`, `agendado`, `en_proceso`, `resuelto`) |
+| `comment` | TEXT | Nullable |
+| `changed_by_user_id` | INTEGER | NOT NULL, FK → users(id) |
+| `created_at` | TIMESTAMPTZ | NOT NULL, DEFAULT NOW() |
+
+Además se definieron índices para las consultas más frecuentes (`reports.user_id`, `reports.status`, `report_status_history.report_id`) y un trigger `set_updated_at` que actualiza automáticamente la columna `updated_at` de `reports` ante cada `UPDATE`.
+
+### EP 2.3: API REST
+
+Se implementaron endpoints organizados en tres archivos de rutas (`health.routes.js`, `auth.routes.js`, `reports.routes.js`). Entre autenticación, salud y reportes se cubren los cuatro verbos HTTP requeridos: `GET`, `POST`, `PATCH` y `DELETE`. Todas las respuestas siguen un formato JSON `{ data, error }` y se usan códigos HTTP de forma consistente (`201`, `400`, `401`, `403`, `404`, `409`, `500`).
+
+La documentación completa de cada endpoint, incluyendo rutas, métodos, permisos requeridos y validaciones de cada campo, se encuentra en [`endpoints.md`](endpoints.md).
+
+### EP 2.4: Consumo de la API desde Ionic React
+
+El frontend consume la API mediante tres módulos en `src/core/api/`:
+
+- **`apiClient.ts`**: cliente HTTP centralizado que utiliza `fetch`. Lee la URL del backend desde `VITE_API_URL` (o usa `localhost:5000/api` por defecto), adjunta el token JWT como header `Authorization: Bearer` cuando se le pasa, y normaliza los errores del backend en una clase `ApiError` con `status` y `message`. Maneja errores de red (servidor caído) y respuestas no-JSON de forma separada.
+- **`authApi.ts`**: funciones `login`, `register` y `getMe` que usan `apiClient` para las llamadas de autenticación.
+- **`reportsApi.ts`**: funciones `createReport`, `getMyReports`, `getAllReports`, `getReportById`, `updateReport` y `deleteReport` que cubren el CRUD completo de reportes.
+
+Cada pantalla del frontend (`ReportPage`, `MyReportsPage`, `AdminReportsPage`) muestra estados de carga y errores mediante toasts de Ionic. El token se obtiene desde `AuthContext` y se pasa a cada llamada API.
+
+### EP 2.5: Autenticación con JWT
+
+**(a) Formularios de registro e inicio de sesión:**
+La pantalla `/login` (`LoginPage`) permite ingresar usuario/email y contraseña, y llama a `POST /api/auth/login`. La pantalla `/registro` (`RegisterPage`) solicita username, RUT, email y contraseña, y llama a `POST /api/auth/register`. Ambos formularios manejan errores del backend y muestran mensajes al usuario.
+
+**(b) Rutas protegidas en frontend:**
+La protección se implementa dentro de cada página. `ReportPage`, `MyReportsPage` y `AdminReportsPage` verifican si el usuario está autenticado y si su rol corresponde; en caso contrario, redirigen a `/login` o `/inicio`. El `AppHeader` adapta dinámicamente los enlaces de navegación según el rol del usuario.
+
+**(c) Generación y validación de JWT:**
+El backend genera tokens con `jsonwebtoken` incluyendo `id`, `username` y `role` del usuario, con expiración de 8 horas. El middleware `requireAuth` en `backend/src/middleware/auth.middleware.js` valida el token en cada request protegida, extrayendo los datos del usuario y adjuntándolos a `req.user`. El frontend persiste el token en `localStorage` y lo restaura al recargar la página validándolo contra `GET /api/auth/me`.
+
+**(d) Diferenciación por roles:**
+Existen dos roles: `ciudadano` y `funcionario`. El registro público siempre crea ciudadanos (el rol se fuerza en el backend); los funcionarios se crean de forma controlada en la base de datos. **Para facilitar la evaluación de la EP2, `npm run db:init` deja creada una cuenta demo de funcionario con contraseña hasheada usando bcrypt.** El middleware `requireFuncionario` bloquea con `403` las rutas administrativas si el token no pertenece a un funcionario. En el frontend, el `AuthContext` expone el rol del usuario para adaptar la navegación y las vistas.
+
+### EP 2.6: Validación y seguridad
+
+**(a) Validación de inputs:**
+El backend valida los datos de entrada antes de cualquier operación. En registro: largo de username (3-50), formato de email, largo mínimo de contraseña (6 caracteres) y validación del RUT (algoritmo digito de verificación). En reportes: `street` (dirección) obligatoria (máx. 160 caracteres), `description` obligatoria, `urgency` restringida a valores permitidos, `status` restringido a valores permitidos, y `scheduledDate` en formato `YYYY-MM-DD` cuando se envía. Los errores de validación responden con `400` y un mensaje específico.
+
+**(b) Hash de contraseñas:**
+Las contraseñas se almacenan exclusivamente como hash usando `bcryptjs` con factor de costo 10. En login se comparan con `bcrypt.compare`. El campo `password_hash` nunca se incluye en las respuestas JSON de la API (la función `publicUser` lo excluye explícitamente).
+
+**(c) Manejo seguro de credenciales:**
+El `JWT_SECRET` y la `DATABASE_URL` se mantienen en variables de entorno (archivo `.env` excluido del repositorio por `.gitignore`). El token se transmite como `Authorization: Bearer` y el backend nunca lo expone más allá de la respuesta de login/registro.
+
+**(d) Protección contra inyección SQL:**
+Todas las consultas a PostgreSQL usan parámetros posicionales (`$1`, `$2`, etc.) en vez de concatenar valores del usuario directamente en el SQL. Esto aplica tanto a las rutas de autenticación como a las de reportes.
+
+### EP 2.7: Pruebas funcionales
+
+**(a) Pruebas en Postman:**
+Se probaron 9 escenarios en Postman cubriendo el ciclo completo de autenticación, creación de reportes, control de acceso por roles y gestión administrativa. La evidencia visual con capturas de pantalla de cada prueba se encuentra en [`evidencias_postman.md`](evidencias_postman.md).
+
+**(b) Documentación de endpoints:**
+La documentación de todos los endpoints del backend (salud, autenticación y reportes), incluyendo formato de respuesta y validaciones, se encuentra en [`endpoints.md`](endpoints.md).
+
+**(c) Evidencia de pruebas:**
+Las capturas de pantalla de Postman están en la carpeta `screenshots/` (archivos `01.png` a `09.png`) y se referencian desde [`evidencias_postman.md`](evidencias_postman.md) con descripción del método, resultado esperado y resultado obtenido para cada caso.
+
+Para la entrega final intentaré implementar un mapa dinámico con reportes reales georreferenciados, además de mejoras como subida real de archivos (las fotos de los reportes).
 
 # Stack
 
@@ -214,3 +323,13 @@ Para inicializar las tablas de PostgreSQL, renombrar `backend/.env.example` a `b
 cd backend
 npm run db:init
 ```
+
+**Importante:** `npm run db:init` requiere que **PostgreSQL esté instalado y ejecutándose**, y que exista una base de datos accesible mediante `DATABASE_URL` (por ejemplo `postgres://postgres:postgres@localhost:5432/no_cables`). El script crea las tablas necesarias y también deja una cuenta demo para facilitar la evaluación.
+
+**Cuenta demo de funcionario:**
+
+- **Usuario:** `funcionario_demo`
+- **Contraseña:** `Funcionario123`
+- **Rol:** `funcionario`
+
+**De nuevo, esto es solo para facilitar la evaluación... En producción no se debería incluir por motivos de seguridad.**

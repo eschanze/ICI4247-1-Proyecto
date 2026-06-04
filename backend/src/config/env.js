@@ -9,5 +9,5 @@ export const env = {
   frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
   databaseUrl:
     process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/no_cables',
-  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
+  jwtSecret: process.env.JWT_SECRET || 'secreto-local-desarrollo',
 };

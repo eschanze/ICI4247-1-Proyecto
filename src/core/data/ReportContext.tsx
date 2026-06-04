@@ -46,7 +46,7 @@ interface ReportContextValue {
   updateReport: (id: string, updates: Partial<Report>, comment?: string) => void;
 }
 
-const SEED_REPORTS: Report[] = [
+const REPORTES_INICIALES: Report[] = [
   {
     id: crypto.randomUUID(),
     authorUsername: 'ciudadano',
@@ -85,9 +85,9 @@ const SEED_REPORTS: Report[] = [
 const ReportContext = createContext<ReportContextValue | null>(null);
 
 // ReportProvider mantiene el estado global de reportes y lo expone a toda la app.
-// En esta versión demo, los datos viven en useState y se pierden al recargar la página.
+// En esta versión local, los datos viven en useState y se pierden al recargar la página.
 export function ReportProvider({ children }: { children: ReactNode }) {
-  const [reports, setReports] = useState<Report[]>(SEED_REPORTS);
+  const [reports, setReports] = useState<Report[]>(REPORTES_INICIALES);
 
   const addReport = (data: NewReportData, authorUsername: string) => {
     const now = new Date().toISOString();

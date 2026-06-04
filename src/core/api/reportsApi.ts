@@ -1,7 +1,7 @@
 import { apiRequest } from './apiClient';
 import type { ReportStatus, UrgencyLevel } from '../data/ReportContext';
 
-// Estos tipos reflejan el contrato real del backend para cuando se reemplaze el ReportContext dummy...
+// Estos tipos reflejan el contrato real del backend para reemplazar el estado local de reportes.
 export interface ApiStatusHistoryEntry {
   status: ReportStatus;
   date: string;

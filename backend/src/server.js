@@ -1,7 +1,7 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 
-// Iniciamos la aplicación Express y la ponemos a escuchar en el puerto especificado en .env.port
+// Iniciamos la aplicación Express y la ponemos a escuchar en el puerto configurado
 const app = createApp();
 
 app.listen(env.port, () => {
