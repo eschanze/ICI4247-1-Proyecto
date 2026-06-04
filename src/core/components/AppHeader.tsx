@@ -9,7 +9,7 @@ import {
   personCircleOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../auth/DummyAuth';
+import { useAuth } from '../auth/AuthContext';
 import logoMuni from '../../assets/logo_municipalidad.png';
 import './AppHeader.css';
 
@@ -33,13 +33,12 @@ const citizenNavItems = [
 // Por ahora son básicos; se extenderán con el panel de gestión en futuras entregas.
 const adminNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
-  { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
   { label: 'Panel Reportes', path: '/admin-reportes', icon: documentTextOutline },
 ];
 
 export function AppHeader() {
   const location = useLocation();
-  const { user, logout } = useDummyAuth();
+  const { user, logout } = useAuth();
 
   // Si no es ciudadano y está logeado, es admin
   const navigationItems = !user ? publicNavItems : user.role === 'ciudadano' ? citizenNavItems : adminNavItems;

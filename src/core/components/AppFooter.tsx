@@ -1,7 +1,7 @@
 import { IonButton, IonFooter, IonIcon, IonToolbar } from '@ionic/react';
 import { addCircleOutline, documentTextOutline, homeOutline, logInOutline, personAddOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../auth/DummyAuth';
+import { useAuth } from '../auth/AuthContext';
 import './AppFooter.css';
 
 // Los mismos items de navegación que usa AppHeader,
@@ -21,13 +21,12 @@ const citizenNavItems = [
 
 const adminNavItems = [
   { label: 'Inicio', path: '/inicio', icon: homeOutline },
-  { label: 'Reportar', path: '/reportar', icon: addCircleOutline },
   { label: 'Panel Reportes', path: '/admin-reportes', icon: documentTextOutline },
 ];
 
 export function AppFooter() {
   const location = useLocation();
-  const { user } = useDummyAuth();
+  const { user } = useAuth();
 
   const navigationItems = !user
     ? publicNavItems

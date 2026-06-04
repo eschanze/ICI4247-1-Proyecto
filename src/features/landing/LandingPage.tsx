@@ -1,5 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPage } from '@ionic/react';
-import { useDummyAuth } from '../../core/auth/DummyAuth';
+import { useAuth } from '../../core/auth/AuthContext';
 import {
   calendarOutline,
   checkmarkDoneOutline,
@@ -45,7 +45,7 @@ const workflowSteps = [
 
 export function LandingPage() {
   usePageTitle('Inicio - Programa No+Cables');
-  const { user } = useDummyAuth();
+  const { user } = useAuth();
 
   return (
     <IonPage>
@@ -61,7 +61,11 @@ export function LandingPage() {
               </p>
 
               <div className="landing-actions" aria-label="Acciones principales">
-                <IonButton className="landing-action-button" size="large" routerLink={user ? "/reportar" : "/registro"}>
+                <IonButton
+                  className="landing-action-button"
+                  size="large"
+                  routerLink={user?.role === 'funcionario' ? '/admin-reportes' : user ? '/reportar' : '/registro'}
+                >
                   Reportar cables en desuso
                 </IonButton>
                 <IonButton

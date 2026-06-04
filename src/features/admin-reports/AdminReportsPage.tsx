@@ -17,7 +17,7 @@ import {
   timeOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../../core/auth/DummyAuth';
+import { useAuth } from '../../core/auth/AuthContext';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { Report, ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
@@ -199,19 +199,25 @@ function AdminReportCard({ report }: { report: Report }) {
 export function AdminReportsPage() {
   usePageTitle('Administración de Reportes - Programa No+Cables');
 
-  const { user } = useDummyAuth();
+  const { user, isLoading } = useAuth();
   const { reports } = useReports();
   const router = useIonRouter();
   const location = useLocation();
 
   // Redirigir si no hay sesión o no es admin
   useEffect(() => {
-    if ((!user || user.role !== 'funcionario') && location.pathname === '/admin-reportes') {
+    if (isLoading || location.pathname !== '/admin-reportes') {
+      return;
+    }
+
+    if (!user) {
+      router.push('/login', 'root');
+    } else if (user.role !== 'funcionario') {
       router.push('/inicio', 'root');
     }
-  }, [router, user, location.pathname]);
+  }, [router, user, isLoading, location.pathname]);
 
-  if (!user || user.role !== 'funcionario') {
+  if (isLoading || !user || user.role !== 'funcionario') {
     return null;
   }
 

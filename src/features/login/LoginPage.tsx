@@ -1,29 +1,30 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { IonButton, IonContent, IonInput, IonItem, IonPage, useIonRouter } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../../core/auth/DummyAuth';
+import { useAuth } from '../../core/auth/AuthContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import './LoginPage.css';
 
 export function LoginPage() {
   usePageTitle('Login - Programa No+Cables');
 
-  const { user, login } = useDummyAuth();
+  const { user, isLoading, login } = useAuth();
   const router = useIonRouter();
   const location = useLocation();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* Si ya está logeado, redirigir a la página principal del ciudadano. */
+  // Si ya está logeado, redirigir a la página principal del ciudadano.
   useEffect(() => {
     if (user && location.pathname === '/login') {
-      router.push('/reportar', 'root');
+      router.push(user.role === 'funcionario' ? '/admin-reportes' : '/reportar', 'root');
     }
   }, [router, user, location.pathname]);
 
-  function handleLogin(event: FormEvent<HTMLFormElement>) {
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
 
@@ -32,16 +33,17 @@ export function LoginPage() {
       return;
     }
 
-    const success = login(username.trim(), password);
-
-    if (!success) {
-      setError('Usuario o contraseña incorrectos.');
+    try {
+      setIsSubmitting(true);
+      await login({ usernameOrEmail: username.trim(), password });
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Usuario o contraseña incorrectos.');
+    } finally {
+      setIsSubmitting(false);
     }
-    // Si el login fue exitoso, el cambio de estado en DummyAuth
-    // provocará un re-render y el useEffect redirigirá.
   }
 
-  if (user) {
+  if (isLoading || user) {
     return null;
   }
 
@@ -92,16 +94,9 @@ export function LoginPage() {
             Olvidé mi contraseña
           </a>
 
-          <IonButton className="login-submit" expand="block" type="submit">
-            Ingresar
+          <IonButton className="login-submit" expand="block" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Ingresando...' : 'Ingresar'}
           </IonButton>
-
-          {/* Credenciales demo */}
-          <div className="login-demo-hint">
-            <p><strong>Credenciales demo:</strong></p>
-            <p>ciudadano / contra123</p>
-            <p>admin / contra123</p>
-          </div>
 
           <IonButton className="register-login-link" fill="clear" routerLink="/registro">
             Crear cuenta

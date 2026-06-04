@@ -1,11 +1,12 @@
 import { apiRequest } from './apiClient';
 
-// Usamos los mismos roles definidos por el backend y el esquema SQL.
+// Usamos los mismos roles definidos por el backend y el esquema SQL
 export type UserRole = 'ciudadano' | 'funcionario';
 
 export interface ApiUser {
   id: number;
   username: string;
+  rut: string | null;
   email: string;
   role: UserRole;
   createdAt: string;
@@ -22,10 +23,11 @@ interface MeResponse {
 
 export function register(data: {
   username: string;
+  rut: string;
   email: string;
   password: string;
 }): Promise<AuthResponse> {
-  // El registro público crea ciudadanos; los funcionarios se crean de forma controlada en backend.
+  // El registro público crea ciudadanos; los funcionarios se crean de forma controlada en backend
   return apiRequest<AuthResponse>('/auth/register', {
     method: 'POST',
     body: data,
@@ -43,6 +45,6 @@ export function login(data: {
 }
 
 export function getMe(token: string): Promise<MeResponse> {
-  // Este endpoint permite reconstruir la sesión si ya tenemos un JWT guardado.
+  // Este endpoint permite reconstruir la sesión si ya tenemos un JWT guardado
   return apiRequest<MeResponse>('/auth/me', { token });
 }

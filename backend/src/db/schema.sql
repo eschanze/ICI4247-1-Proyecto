@@ -4,6 +4,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
+  rut VARCHAR(12) NOT NULL UNIQUE,
   email VARCHAR(120) NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   role VARCHAR(20) NOT NULL CHECK (role IN ('ciudadano', 'funcionario')),

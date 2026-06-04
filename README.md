@@ -2,7 +2,7 @@
 ### Integrantes: Esteban Schanze Cárdenas
 ## Municipalidad de Santo Domingo - Programa No+Cables
 
-Esqueleto inicial (boilerplate + estructura de carpetas) para el proyecto semestral.
+Proyecto semestral con frontend Ionic React y backend Express/PostgreSQL para la entrega EP2.
 
 Ataca el desafío número 19: "Proliferación de cables de servicios (electricidad, telecomunicaciones) en desuso que generan contaminación visual y riesgos para la seguridad, con una compleja gestión para su retiro."
 
@@ -70,7 +70,7 @@ Aquellas directamente accesibles desde la navegación global (Header) y represen
 - `/reportar` (`ReportPage`): Formulario principal para registrar un nuevo incidente de cables caídos/en desuso.
 - `/mis-reportes` (`MyReportsPage`): Panel personal para hacer seguimiento de los reportes enviados.
 - `/admin-reportes` (`AdminReportsPage`): Panel de administración general de incidentes.
-- `/login` (`LoginPage`): Acceso al sistema.
+- `/login` (`LoginPage`): Acceso al sistema mediante el backend real de autenticación.
 
 **Rutas Secundarias:**
 Aquellas a las que se accede mediante flujos específicos y no desde la navegación principal constante:
@@ -100,9 +100,9 @@ El flujo está diseñado intencionalmente de manera circular, permitiendo al usu
 ### (d) Diferenciación de acceso según roles
 
 La interfaz se adapta dinámicamente según el rol del usuario autenticado:
-- **Usuario Invitado (No autenticado):** Tiene acceso a las vistas públicas (`/inicio`, `/mapa`, `/reportar`). Se le invita a usar el `/login`.
-- **Usuario Ciudadano (Rol: user):** Se ocultan los botones de Login/Registro. Se habilita el acceso a `/mis-reportes` para hacer seguimiento de sus incidentes personales.
-- **Usuario Administrador (Rol: admin):** Se oculta la opción `/mis-reportes` (ya que no reporta como ciudadano) y se despliega la pestaña exclusiva `/admin-reportes`, la cual le permite visualizar todos los incidentes del sistema, cambiar sus estados (ej. "En progreso", "Resuelto") y clasificar su urgencia.
+- **Usuario Invitado (No autenticado):** Tiene acceso a las vistas públicas (`/inicio`, `/mapa`, `/login`, `/registro`). Si intenta reportar o revisar reportes, se redirige a `/login`.
+- **Usuario Ciudadano (Rol: `ciudadano`):** Se ocultan los botones de Login/Registro. Se habilita el acceso a `/reportar` y `/mis-reportes` para crear y seguir sus incidentes personales.
+- **Usuario Funcionario (Rol: `funcionario`):** Se ocultan las opciones ciudadanas y se despliega la pestaña exclusiva `/admin-reportes`, la cual le permite visualizar todos los incidentes del sistema, cambiar sus estados (ej. "En progreso", "Resuelto") y clasificar su urgencia.
 
 ---
 
@@ -113,7 +113,7 @@ La interfaz se adapta dinámicamente según el rol del usuario autenticado:
 2. Se renderiza el `ReportPage`.
 3. El usuario interactúa con el formulario: ingresa título, descripción, ubicación y adjunta una imagen de evidencia.
 4. Hace clic en "Enviar Reporte".
-5. El sistema valida los datos y guarda el reporte (en este caso, en el `ReportContext`).
+5. El sistema valida los datos y guarda el reporte en el `ReportContext` de frontend. El backend ya tiene endpoints reales para reportes, pero estas pantallas aún no reemplazan completamente el estado en memoria.
 6. El usuario es redirigido a `/mis-reportes` o ve un mensaje de éxito, cerrando el ciclo de la tarea.
 
 **Tarea Secundaria: Gestión administrativa de un reporte**
@@ -157,7 +157,7 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 - **Eficiencia de Interacción:** En lugar de recargar la página completa, el uso de React Router y `IonRouterOutlet` permite transiciones casi instantáneas, simulando el rendimiento de una aplicación nativa.
 - **Escalabilidad de la Arquitectura Frontend:** 
   - **CSS Centralizado:** El uso de un sistema de variables globales (`index.css`) permite escalar y mantener el tema visual de manera muy sencilla. No se usaron frameworks de utilidades para mantener el HTML lo más limpio posible.
-  - **Context API:** Para los requerimientos actuales (estado de usuario y reportes en memoria), se utilizó React Context (`ReportContext` y `DummyAuth`) en lugar de librerías pesadas. Esto será reemplazado para la siguiente entrega, donde se integrará el backend.
+  - **Context API:** La autenticación usa `AuthContext` con JWT entregado por el backend y persistido en `localStorage`. Los reportes aún usan `ReportContext` en memoria en las pantallas principales, aunque ya existe cliente API para conectar los endpoints reales de reportes.
   - **Componentización:** Se utilizó la estructura de carpetas sugerida por el profesor en clases. Se separaron las vistas por "Features" (ej. `/features/report/`, `/features/map/`) agrupando su lógica, vista y estilos. Esto facilita encontrar, modificar y probar componentes de forma aislada a medida que el proyecto crece.
 
 ---
@@ -166,6 +166,8 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 
 **Frontend:** Ionic con React y TypeScript, empaquetado con Vite  
 **Backend:** Node.js con Express
+
+**Base de datos:** PostgreSQL
 
 ## Pasos para ejecutar el proyecto
 
@@ -196,6 +198,8 @@ npm run dev
 ```
 
 Backend queda disponible en `http://localhost:5000/api`.
+
+El frontend usa `http://localhost:5000/api` por defecto. Si se necesita cambiar la URL del backend, definir `VITE_API_URL`.
 
 Endpoints de prueba:
 

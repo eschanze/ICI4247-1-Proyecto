@@ -19,7 +19,7 @@ import {
   timeOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../../core/auth/DummyAuth';
+import { useAuth } from '../../core/auth/AuthContext';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { Report, ReportStatus } from '../../core/data/ReportContext';
@@ -154,21 +154,25 @@ function ReportCard({ report }: { report: Report }) {
 export function MyReportsPage() {
   usePageTitle('Mis reportes - Programa No+Cables');
 
-  const { user } = useDummyAuth();
+  const { user, isLoading } = useAuth();
   const { getReportsByUser } = useReports();
   const router = useIonRouter();
   const location = useLocation();
 
   /* Redirigir si no hay sesión o es funcionario */
   useEffect(() => {
-    if (!user && location.pathname === '/mis-reportes') {
+    if (isLoading || location.pathname !== '/mis-reportes') {
+      return;
+    }
+
+    if (!user) {
       router.push('/login', 'root');
-    } else if (user?.role === 'funcionario' && location.pathname === '/mis-reportes') {
+    } else if (user.role === 'funcionario') {
       router.push('/admin-reportes', 'root');
     }
-  }, [router, user, location.pathname]);
+  }, [router, user, isLoading, location.pathname]);
 
-  if (!user) {
+  if (isLoading || !user || user.role === 'funcionario') {
     return null;
   }
 

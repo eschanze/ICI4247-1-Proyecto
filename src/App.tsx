@@ -1,5 +1,5 @@
 import { IonApp } from '@ionic/react';
-import { DummyAuthProvider } from './core/auth/DummyAuth';
+import { AuthProvider } from './core/auth/AuthContext';
 import { ReportProvider } from './core/data/ReportContext';
 import { AppRouter } from './core/router/AppRouter';
 
@@ -13,11 +13,11 @@ import { AppRouter } from './core/router/AppRouter';
 export default function App() {
   return (
     <IonApp>
-      <DummyAuthProvider>
+      <AuthProvider>
         <ReportProvider>
           <AppRouter />
         </ReportProvider>
-      </DummyAuthProvider>
+      </AuthProvider>
     </IonApp>
   );
 }

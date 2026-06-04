@@ -23,7 +23,7 @@ import {
 } from '@ionic/react';
 import { cameraOutline, closeCircleOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useDummyAuth } from '../../core/auth/DummyAuth';
+import { useAuth } from '../../core/auth/AuthContext';
 import { useReports } from '../../core/data/ReportContext';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { UrgencyLevel } from '../../core/data/ReportContext';
@@ -32,7 +32,7 @@ import './ReportPage.css';
 export function ReportPage() {
   usePageTitle('Reportar incidente - Programa No+Cables');
 
-  const { user } = useDummyAuth();
+  const { user, isLoading } = useAuth();
   const { addReport } = useReports();
 
   const router = useIonRouter();
@@ -49,12 +49,18 @@ export function ReportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!user && location.pathname === '/reportar') {
-      router.push('/login', 'root');
+    if (isLoading || location.pathname !== '/reportar') {
+      return;
     }
-  }, [router, user, location.pathname]);
 
-  if (!user) {
+    if (!user) {
+      router.push('/login', 'root');
+    } else if (user.role === 'funcionario') {
+      router.push('/admin-reportes', 'root');
+    }
+  }, [router, user, isLoading, location.pathname]);
+
+  if (isLoading || !user || user.role === 'funcionario') {
     return null;
   }
 

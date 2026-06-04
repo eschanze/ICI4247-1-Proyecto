@@ -10,6 +10,7 @@ export const authRouter = Router();
 
 const MIN_PASSWORD_LENGTH = 6;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const RUT_PATTERN = /^(\d{7,8})-([\dK])$/;
 
 function createToken(user) {
   // Incluimos solo los datos necesarios para identificar sesión y permisos
@@ -29,19 +30,64 @@ function publicUser(row) {
   return {
     id: row.id,
     username: row.username,
+    rut: row.rut,
     email: row.email,
     role: row.role,
     createdAt: row.created_at,
   };
 }
 
+function normalizeRut(value) {
+  const cleanRut = String(value || '')
+    .trim()
+    .replace(/\./g, '')
+    .replace(/\s/g, '')
+    .toUpperCase();
+
+  if (!cleanRut) return '';
+  if (cleanRut.includes('-')) return cleanRut;
+
+  return `${cleanRut.slice(0, -1)}-${cleanRut.slice(-1)}`;
+}
+
+function isValidRut(value) {
+  const match = RUT_PATTERN.exec(value);
+
+  if (!match) {
+    return false;
+  }
+
+  const [, body, verifier] = match;
+  let multiplier = 2;
+  let sum = 0;
+
+  for (let index = body.length - 1; index >= 0; index -= 1) {
+    sum += Number(body[index]) * multiplier;
+    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+  }
+
+  const expectedValue = 11 - (sum % 11);
+  const expectedVerifier = expectedValue === 11
+    ? '0'
+    : expectedValue === 10
+      ? 'K'
+      : String(expectedValue);
+
+  return verifier === expectedVerifier;
+}
+
 function validateRegistration(body) {
   const username = String(body.username || '').trim();
+  const rut = normalizeRut(body.rut);
   const email = String(body.email || '').trim().toLowerCase();
   const password = String(body.password || '');
 
   if (!username || username.length < 3 || username.length > 50) {
     return { error: 'El nombre de usuario debe tener entre 3 y 50 caracteres' };
+  }
+
+  if (!isValidRut(rut)) {
+    return { error: 'El RUT no tiene un formato valido' };
   }
 
   if (!EMAIL_PATTERN.test(email) || email.length > 120) {
@@ -54,7 +100,7 @@ function validateRegistration(body) {
     };
   }
 
-  return { username, email, password };
+  return { username, rut, email, password };
 }
 
 function validateLogin(body) {
@@ -84,11 +130,11 @@ authRouter.post('/register', async (req, res, next) => {
     // El registro público siempre crea ciudadanos; los funcionarios se crean de forma controlada
     const result = await pool.query(
       `
-        INSERT INTO users (username, email, password_hash, role)
-        VALUES ($1, $2, $3, 'ciudadano')
-        RETURNING id, username, email, role, created_at
+        INSERT INTO users (username, rut, email, password_hash, role)
+        VALUES ($1, $2, $3, $4, 'ciudadano')
+        RETURNING id, username, rut, email, role, created_at
       `,
-      [input.username, input.email, passwordHash],
+      [input.username, input.rut, input.email, passwordHash],
     );
 
     const user = publicUser(result.rows[0]);
@@ -102,7 +148,7 @@ authRouter.post('/register', async (req, res, next) => {
     if (error.code === '23505') {
       return res.status(409).json({
         data: null,
-        error: { message: 'El usuario o email ya existe' },
+        error: { message: 'El usuario, email o RUT ya existe' },
       });
     }
 
@@ -123,7 +169,7 @@ authRouter.post('/login', async (req, res, next) => {
 
     const result = await pool.query(
       `
-        SELECT id, username, email, password_hash, role, created_at
+        SELECT id, username, rut, email, password_hash, role, created_at
         FROM users
         WHERE username = $1 OR LOWER(email) = LOWER($1)
         LIMIT 1
@@ -159,7 +205,7 @@ authRouter.get('/me', requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
       `
-        SELECT id, username, email, role, created_at
+        SELECT id, username, rut, email, role, created_at
         FROM users
         WHERE id = $1
         LIMIT 1
