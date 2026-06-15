@@ -46,11 +46,72 @@
   display: none;
 }
 
+.report-upload-zone {
+  align-items: center;
+  background:
+    linear-gradient(rgba(242, 183, 5, 0.08), rgba(242, 183, 5, 0.08)),
+    var(--app-surface);
+  border: 2px dashed var(--app-ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  min-height: 190px;
+  outline: none;
+  padding: 24px;
+  text-align: center;
+  transition:
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+  width: min(100%, 460px);
+}
+
+.report-upload-zone:hover,
+.report-upload-zone:focus-visible,
+.report-upload-zone-active {
+  background:
+    linear-gradient(rgba(242, 183, 5, 0.16), rgba(242, 183, 5, 0.16)),
+    var(--app-surface);
+  box-shadow: 4px 4px 0 var(--app-ink);
+  transform: translate(-1px, -1px);
+}
+
+.report-upload-icon {
+  background: var(--app-paper);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 3px 3px 0 var(--app-ink);
+  color: var(--app-ink);
+  font-size: 34px;
+  padding: 10px;
+}
+
 .report-upload-button {
-  /* Botón para seleccionar la foto. */
-  --background: var(--app-surface);
-  --color: var(--app-ink);
-  align-self: start;
+  align-items: center;
+  background: var(--ion-color-primary);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 4px 4px 0 var(--app-ink);
+  color: var(--app-ink);
+  display: inline-flex;
+  font-size: 0.98rem;
+  font-weight: 800;
+  gap: 8px;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+}
+
+.report-upload-button ion-icon {
+  font-size: 20px;
+}
+
+.report-upload-copy {
+  color: rgba(31, 41, 51, 0.78);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+  max-width: 280px;
 }
 
 .report-photo-preview {
@@ -115,6 +176,16 @@
   .report-card {
     box-shadow: 5px 5px 0 var(--app-ink);
     padding: 22px;
+  }
+
+  .report-upload-zone {
+    min-height: 150px;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .report-upload-copy {
+    display: none;
   }
 
   #report-title {

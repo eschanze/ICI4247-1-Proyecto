@@ -7,7 +7,7 @@
  * Si el usuario no tiene sesión activa, se le redirige a /login.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, type DragEvent, type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import {
   IonButton,
   IonContent,
@@ -21,7 +21,7 @@ import {
   useIonRouter,
   useIonToast,
 } from '@ionic/react';
-import { cameraOutline, closeCircleOutline } from 'ionicons/icons';
+import { cameraOutline, closeCircleOutline, cloudUploadOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
 import { createReport } from '../../core/api/reportsApi';
@@ -44,6 +44,7 @@ export function ReportPage() {
   const [urgency, setUrgency] = useState<UrgencyLevel>('media');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ street?: string; description?: string }>({});
+  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -64,15 +65,57 @@ export function ReportPage() {
     return null;
   }
 
-  function handlePhotoChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  function previewPhotoFile(file: File) {
+    if (!file.type.startsWith('image/')) {
+      presentToast({
+        message: 'El archivo seleccionado debe ser una imagen.',
+        duration: 2500,
+        position: 'top',
+        color: 'warning',
+      });
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
       setPhotoPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+  }
+
+  function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    previewPhotoFile(file);
+  }
+
+  function handlePhotoDragOver(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setIsDraggingPhoto(true);
+  }
+
+  function handlePhotoDragLeave(event: DragEvent<HTMLLabelElement>) {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setIsDraggingPhoto(false);
+    }
+  }
+
+  function handlePhotoDrop(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setIsDraggingPhoto(false);
+
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+
+    previewPhotoFile(file);
+  }
+
+  function handlePhotoKeyDown(event: KeyboardEvent<HTMLLabelElement>) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      fileInputRef.current?.click();
+    }
   }
 
   // Eliminamos la foto seleccionada y reseteamos el input de archivos
@@ -199,6 +242,7 @@ export function ReportPage() {
               <span className="login-field-label">Foto adjunta (opcional)</span>
 
               <input
+                id="report-photo-input"
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
@@ -207,14 +251,25 @@ export function ReportPage() {
               />
 
               {!photoPreview ? (
-                <IonButton
-                  className="report-upload-button"
-                  fill="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                <label
+                  className={`report-upload-zone${isDraggingPhoto ? ' report-upload-zone-active' : ''}`}
+                  htmlFor="report-photo-input"
+                  role="button"
+                  tabIndex={0}
+                  onDragOver={handlePhotoDragOver}
+                  onDragLeave={handlePhotoDragLeave}
+                  onDrop={handlePhotoDrop}
+                  onKeyDown={handlePhotoKeyDown}
                 >
-                  <IonIcon icon={cameraOutline} slot="start" />
-                  Seleccionar foto
-                </IonButton>
+                  <IonIcon className="report-upload-icon" icon={cloudUploadOutline} aria-hidden="true" />
+                  <span className="report-upload-button">
+                    <IonIcon icon={cameraOutline} aria-hidden="true" />
+                    Agregar archivos
+                  </span>
+                  <span className="report-upload-copy">
+                    Arrastra una foto aquí o selecciona un archivo
+                  </span>
+                </label>
               ) : (
                 <div className="report-photo-preview">
                   <img src={photoPreview} alt="Vista previa de la foto adjunta" />
