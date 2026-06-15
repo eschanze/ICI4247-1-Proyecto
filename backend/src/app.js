@@ -10,8 +10,17 @@ import { reportsRouter } from './routes/reports.routes.js';
 export function createApp() {
   const app = express();
 
-  // Configuramos CORS para permitir solicitudes desde el origen del frontend especificado en .env.frontendOrigin
-  app.use(cors({ origin: env.frontendOrigin }));
+  // Configuramos CORS para permitir los orígenes locales usados por Vite en desarrollo.
+  app.use(cors({
+    origin(origin, callback) {
+      if (!origin || env.frontendOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origen no permitido por CORS'));
+    },
+  }));
   // Configuramos Express para parsear JSON con un límite máximo de 1MB (medida contra ataques que utilizan payloads grandes)
   app.use(express.json({ limit: '1mb' }));
 
