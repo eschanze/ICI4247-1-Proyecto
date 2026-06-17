@@ -17,10 +17,10 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Si ya está logeado, redirigir a la página principal del ciudadano.
+  // Si ya está logeado, redirigir al panel correspondiente según su rol.
   useEffect(() => {
     if (user && location.pathname === '/login') {
-      router.push(user.role === 'funcionario' ? '/admin-reportes' : '/reportar', 'root');
+      router.push(user.role === 'funcionario' ? '/admin-reportes' : '/mis-reportes', 'root');
     }
   }, [router, user, location.pathname]);
 

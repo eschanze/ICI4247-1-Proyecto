@@ -185,7 +185,7 @@ export function ReportPage() {
 
           <div className="login-fields report-fields">
             {/* Dirección */}
-            <div className="login-field-group report-field-full">
+            <div className="login-field-group report-field-full report-street-field">
               <label className="login-field-label" htmlFor="report-street">
                 Dirección (calle y número)
               </label>
@@ -219,7 +219,7 @@ export function ReportPage() {
             </div>
 
             {/* Urgencia */}
-            <div className="login-field-group">
+            <div className="login-field-group report-urgency-group">
               <label className="login-field-label" htmlFor="report-urgency">
                 Nivel de urgencia percibido
               </label>
