@@ -8,17 +8,18 @@
  */
 
 import { useEffect, useState } from 'react';
-import { IonBadge, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonSelect, IonSelectOption, useIonRouter, useIonToast } from '@ionic/react';
+import { IonBadge, IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonSelect, IonSelectOption, useIonAlert, useIonRouter, useIonToast } from '@ionic/react';
 import {
   alertCircleOutline,
   calendarOutline,
   chevronDownOutline,
   chevronUpOutline,
   timeOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
-import { getAllReports, updateReport as updateReportApi } from '../../core/api/reportsApi';
+import { deleteReport, getAllReports, updateReport as updateReportApi } from '../../core/api/reportsApi';
 import type { ApiReport } from '../../core/api/reportsApi';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
@@ -66,13 +67,16 @@ function formatShortDate(isoDate: string): string {
 function AdminReportCard({
   report,
   onReportUpdated,
+  onReportDeleted,
 }: {
   report: ApiReport;
   onReportUpdated: (updated: ApiReport) => void;
+  onReportDeleted: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const { token } = useAuth();
   const [presentToast] = useIonToast();
+  const [presentAlert] = useIonAlert();
 
   const statusConfig = STATUS_CONFIG[report.status];
   const urgencyColor = URGENCY_COLORS[report.urgency] ?? 'medium';
@@ -98,6 +102,29 @@ function AdminReportCard({
     } catch {
       presentToast({ message: 'No se pudo actualizar la urgencia.', duration: 3000, position: 'top', color: 'danger' });
     }
+  };
+
+  const handleDelete = () => {
+    presentAlert({
+      header: 'Eliminar reporte',
+      message: `¿Estás seguro de que deseas eliminar el reporte "${report.street}"? Esta acción no se puede deshacer.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await deleteReport(token!, report.id);
+              onReportDeleted(report.id);
+              presentToast({ message: 'Reporte eliminado.', duration: 2500, position: 'top', color: 'success' });
+            } catch {
+              presentToast({ message: 'No se pudo eliminar el reporte.', duration: 3000, position: 'top', color: 'danger' });
+            }
+          },
+        },
+      ],
+    });
   };
 
   return (
@@ -163,6 +190,11 @@ function AdminReportCard({
                 <IonSelectOption value="alta">Alta</IonSelectOption>
               </IonSelect>
             </IonItem>
+
+            <IonButton fill="outline" color="danger" onClick={handleDelete} style={{ marginTop: '12px' }}>
+              <IonIcon icon={trashOutline} slot="start" />
+              Eliminar reporte
+            </IonButton>
           </div>
 
           {/* Descripción */}
@@ -274,6 +306,10 @@ export function AdminReportsPage() {
     setReports((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
   }
 
+  function handleReportDeleted(id: string) {
+    setReports((prev) => prev.filter((r) => r.id !== id));
+  }
+
   return (
     <IonPage>
       <IonContent className="login-content">
@@ -294,7 +330,7 @@ export function AdminReportsPage() {
           ) : allReports.length > 0 ? (
             <div className="my-reports-list">
               {allReports.map((report) => (
-                <AdminReportCard key={report.id} report={report} onReportUpdated={handleReportUpdated} />
+                <AdminReportCard key={report.id} report={report} onReportUpdated={handleReportUpdated} onReportDeleted={handleReportDeleted} />
               ))}
             </div>
           ) : (
