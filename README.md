@@ -271,6 +271,50 @@ Las capturas de pantalla de Postman están en la carpeta `screenshots/` (archivo
 
 Para la entrega final intentaré implementar un mapa dinámico con reportes reales georreferenciados, además de mejoras como subida real de archivos (las fotos de los reportes).
 
+---
+
+## Entrega Final: Funcionalidades avanzadas, optimizar rendimiento y despliegue
+
+### EF 1: Funcionalidades completas (CRUD, notificaciones, almacenamiento local)
+
+El CRUD de reportes queda cubierto de extremo a extremo: los ciudadanos pueden crear y consultar sus reportes, mientras que el funcionario puede listar todos los casos, actualizar estado y urgencia, y eliminar reportes desde el panel de administración mediante el endpoint `DELETE /api/reports/:id`. La interfaz muestra notificaciones breves con `useIonToast` para operaciones exitosas o fallidas, y la sesión se mantiene en almacenamiento local guardando el JWT en `localStorage`, validándolo contra el backend al recargar la aplicación.
+
+### EF 2: Mejoras en UI/UX y optimización de rendimiento
+
+**(a) Rediseño de la zona de carga de fotos en el formulario de reporte:**
+
+La versión anterior de `ReportPage` usaba un `IonButton` outline para seleccionar la foto adjunta. El problema era que ese botón tenía el mismo peso visual y tamaño que el botón principal "Enviar reporte", así que la jerarquía del formulario no era clara: no se distinguía de un vistazo cuál era la acción principal y cuál la secundaria. Además, la única forma de adjuntar una foto era hacer clic en ese botón, sin ninguna otra indicación visual.
+
+Se reemplazó por una zona de carga (drop zone) amplia con borde punteado, ícono de nube y texto de ayuda ("Arrastra una foto aquí o selecciona un archivo"). La zona soporta drag-and-drop con feedback visual al arrastrar, valida que el archivo sea una imagen antes de procesarlo, y es accesible por teclado (`Enter`/`Espacio` abren el explorador de archivos). En móvil el texto de ayuda se oculta para ahorrar espacio. Ahora la zona de carga se diferencia claramente del botón de envío: una invita a interactuar (borde punteado, área grande), el otro es la acción principal del formulario (sólido, prominente).
+
+**(b) Optimización de rendimiento:**
+
+Se aplicó "code splitting" en `AppRouter.tsx` usando `React.lazy()` y `<Suspense>` para cargar cada página solo cuando su ruta se visita. Con esto el bundle inicial deja de incluir todas las vistas principales de la aplicación, y el usuario ve un `IonSpinner` como fallback mientras se descarga el módulo necesario para la ruta solicitada.
+
+**(c) Ajuste de navegación post-login:**
+
+Cumpliendo con una sugerencia que se me hizo en la evaluación de la EP1, se ajustó la redirección después del inicio de sesión para que cada rol llegue directamente a su flujo principal. El ciudadano ahora aterriza en `/mis-reportes`, donde puede revisar el seguimiento de sus solicitudes, y el funcionario entra en `/admin-reportes`, que es el panel operativo para gestionar todos los reportes del sistema.
+
+### EF 3: Seguridad avanzada en API
+
+La API incorpora medidas de seguridad en varias capas: las consultas a PostgreSQL usan parámetros preparados para reducir riesgo de inyección SQL, las contraseñas se almacenan con hash mediante `bcrypt`, y CORS se restringe a una whitelist de orígenes configurados. Además, Express ahora usa `helmet` para agregar headers HTTP de seguridad y `express-rate-limit` para limitar cada IP a 100 solicitudes cada 15 minutos, reduciendo exposición ante abuso automatizado o ráfagas de peticiones.
+
+### EF 4: Optimización de consultas y respuesta eficiente
+
+<!-- TODO: Documentar índices en la base de datos (ya definidos en schema.sql), paginación de resultados, caché, y otras optimizaciones de queries. -->
+
+### EF 5: Integración con servicio externo (AWS o APIs de terceros)
+
+<!-- TODO: Documentar integración con servicio externo. Google Maps API se usa en frontend pero con datos dummy. Evaluar conexión del mapa a datos reales del backend, integración con servicio de email (Nodemailer/SendGrid) para notificaciones, o subida de fotos a S3/Cloudinary. -->
+
+### EF 6: Despliegue con Docker
+
+<!-- TODO: Documentar creación de Dockerfile para backend y frontend, docker-compose para orquestación de servicios (API, base de datos PostgreSQL, frontend), y pruebas de despliegue local. -->
+
+---
+
+<br>
+
 # Stack
 
 **Frontend:** Ionic con React y TypeScript, empaquetado con Vite  
