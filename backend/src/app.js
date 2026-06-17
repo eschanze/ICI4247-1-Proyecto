@@ -1,5 +1,7 @@
 import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 import { env } from './config/env.js';
 import { authRouter } from './routes/auth.routes.js';
@@ -9,6 +11,18 @@ import { reportsRouter } from './routes/reports.routes.js';
 // Función principal para crear la aplicación Express
 export function createApp() {
   const app = express();
+
+  // Headers HTTP de seguridad (X-Content-Type-Options, X-Frame-Options, etc.)
+  app.use(helmet());
+
+  // Limitador de tasa: máximo 100 solicitudes por IP cada 15 minutos
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { data: null, error: { message: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' } },
+  }));
 
   // Configuramos CORS para permitir los orígenes locales usados por Vite en desarrollo.
   app.use(cors({
