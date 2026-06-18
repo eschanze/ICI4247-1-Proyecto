@@ -22,9 +22,20 @@ CREATE TABLE IF NOT EXISTS reports (
     CHECK (status IN ('pendiente', 'verificado', 'agendado', 'en_proceso', 'resuelto')),
   scheduled_date DATE,
   photo_url TEXT,
+  latitude NUMERIC(10, 7),
+  longitude NUMERIC(10, 7),
+  geocoding_status VARCHAR(20) NOT NULL DEFAULT 'pendiente'
+    CHECK (geocoding_status IN ('pendiente', 'ok', 'fallido', 'sin_api_key')),
+  geocoded_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migración simple para bases ya creadas antes de EF5.
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS latitude NUMERIC(10, 7);
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS longitude NUMERIC(10, 7);
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS geocoding_status VARCHAR(20) NOT NULL DEFAULT 'pendiente';
+ALTER TABLE reports ADD COLUMN IF NOT EXISTS geocoded_at TIMESTAMPTZ;
 
 -- Tabla del historial de cambios de estado de los reportes --
 CREATE TABLE IF NOT EXISTS report_status_history (
@@ -40,6 +51,10 @@ CREATE TABLE IF NOT EXISTS report_status_history (
 -- Índices para optimizar consultas frecuentes
 CREATE INDEX IF NOT EXISTS idx_reports_user_id ON reports(user_id);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
+CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reports_user_created_at ON reports(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reports_coordinates ON reports(latitude, longitude)
+  WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_report_status_history_report_id
   ON report_status_history(report_id);
 

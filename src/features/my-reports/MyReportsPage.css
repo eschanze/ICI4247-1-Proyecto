@@ -30,6 +30,20 @@
   gap: 16px;
 }
 
+.my-reports-pagination {
+  /* Controles simples para no pedir todos los reportes de una sola vez. */
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.my-reports-pagination span {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
 .my-report-card {
   /* Tarjeta individual con el estilo neobrutalist del proyecto. */
   background: var(--app-surface);
@@ -291,6 +305,10 @@
     /* En pantallas chicas apila título y botón. */
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .my-reports-pagination {
+    flex-wrap: wrap;
   }
 
   .my-report-card {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { pool } from '../db/pool.js';
 import { requireAuth, requireFuncionario } from '../middleware/auth.middleware.js';
+import { geocodeReportStreet } from '../services/geocoding.service.js';
 
 export const reportsRouter = Router();
 
@@ -15,6 +16,11 @@ const STATUS_ORDER = {
   resuelto: 4,
 };
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const DEFAULT_PAGE = 1;
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 50;
+const CACHE_TTL_MS = 30 * 1000;
+const cache = new Map();
 
 function badRequest(message) {
   return {
@@ -31,6 +37,53 @@ function parseReportId(value) {
   }
 
   return id;
+}
+
+function parsePagination(query = {}) {
+  const rawPage = Number(query.page);
+  const rawPageSize = Number(query.pageSize);
+  const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : DEFAULT_PAGE;
+  const pageSize = Number.isInteger(rawPageSize) && rawPageSize > 0
+    ? Math.min(rawPageSize, MAX_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE;
+
+  return {
+    page,
+    pageSize,
+    offset: (page - 1) * pageSize,
+  };
+}
+
+function buildPaginationMeta(totalItems, page, pageSize) {
+  return {
+    page,
+    pageSize,
+    totalItems,
+    totalPages: Math.max(1, Math.ceil(totalItems / pageSize)),
+  };
+}
+
+function getCache(key) {
+  const entry = cache.get(key);
+
+  if (!entry || entry.expiresAt < Date.now()) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.value;
+}
+
+function setCache(key, value) {
+  cache.set(key, {
+    value,
+    expiresAt: Date.now() + CACHE_TTL_MS,
+  });
+}
+
+function clearReportCache() {
+  // Borramos todo porque es un cache chico y solo contiene lecturas de reportes.
+  cache.clear();
 }
 
 function formatDateOnly(value) {
@@ -52,6 +105,9 @@ function publicReport(row, history = []) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     scheduledDate: formatDateOnly(row.scheduled_date),
+    latitude: row.latitude === null || row.latitude === undefined ? null : Number(row.latitude),
+    longitude: row.longitude === null || row.longitude === undefined ? null : Number(row.longitude),
+    geocodingStatus: row.geocoding_status,
     statusHistory: history.map((entry) => ({
       status: entry.status,
       date: entry.created_at,
@@ -60,7 +116,7 @@ function publicReport(row, history = []) {
   };
 }
 
-async function getReportRows(whereSql = '', values = []) {
+async function getReportRows(whereSql = '', values = [], tailSql = '') {
   // Centralizamos la consulta base para mantener el mismo formato en listados y detalle
   const result = await pool.query(
     `
@@ -74,17 +130,43 @@ async function getReportRows(whereSql = '', values = []) {
         reports.status,
         reports.scheduled_date,
         reports.photo_url,
+        reports.latitude,
+        reports.longitude,
+        reports.geocoding_status,
         reports.created_at,
         reports.updated_at
       FROM reports
       INNER JOIN users ON users.id = reports.user_id
       ${whereSql}
       ORDER BY reports.created_at DESC
+      ${tailSql}
     `,
     values,
   );
 
   return result.rows;
+}
+
+async function getPaginatedReportRows(whereSql = '', values = [], { page, pageSize, offset }) {
+  const rows = await getReportRows(
+    whereSql,
+    [...values, pageSize, offset],
+    `LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+  );
+
+  const countResult = await pool.query(
+    `
+      SELECT COUNT(*)::int AS total
+      FROM reports
+      ${whereSql}
+    `,
+    values,
+  );
+
+  return {
+    rows,
+    pagination: buildPaginationMeta(countResult.rows[0].total, page, pageSize),
+  };
 }
 
 async function getHistoryByReportIds(reportIds) {
@@ -196,6 +278,12 @@ function validateReportUpdate(body = {}) {
 
 reportsRouter.get('/stats', async (_req, res, next) => {
   try {
+    const cached = getCache('report-stats');
+
+    if (cached) {
+      return res.json(cached);
+    }
+
     // Dejamos esta métrica pública porque /inicio la usa antes de que exista sesión.
     const result = await pool.query(
       `
@@ -210,13 +298,57 @@ reportsRouter.get('/stats', async (_req, res, next) => {
       `,
     );
 
-    return res.json({
+    const payload = {
       data: {
         activeReports: result.rows[0].active_reports,
         participantNeighbors: result.rows[0].participant_neighbors,
       },
       error: null,
-    });
+    };
+
+    setCache('report-stats', payload);
+    return res.json(payload);
+  } catch (error) {
+    return next(error);
+  }
+});
+
+reportsRouter.get('/map', async (_req, res, next) => {
+  try {
+    const cached = getCache('report-map');
+
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const result = await pool.query(
+      `
+        SELECT id, street, urgency, status, latitude, longitude, created_at
+        FROM reports
+        WHERE latitude IS NOT NULL
+          AND longitude IS NOT NULL
+        ORDER BY created_at DESC
+        LIMIT 500
+      `,
+    );
+
+    const payload = {
+      data: {
+        reports: result.rows.map((row) => ({
+          id: String(row.id),
+          street: row.street,
+          urgency: row.urgency,
+          status: row.status,
+          latitude: Number(row.latitude),
+          longitude: Number(row.longitude),
+          createdAt: row.created_at,
+        })),
+      },
+      error: null,
+    };
+
+    setCache('report-map', payload);
+    return res.json(payload);
   } catch (error) {
     return next(error);
   }
@@ -239,6 +371,7 @@ reportsRouter.post('/', async (req, res, next) => {
     return res.status(400).json(badRequest(input.error));
   }
 
+  const geocoding = await geocodeReportStreet(input.street);
   const client = await pool.connect();
 
   try {
@@ -247,11 +380,30 @@ reportsRouter.post('/', async (req, res, next) => {
 
     const reportResult = await client.query(
       `
-        INSERT INTO reports (user_id, street, description, urgency, photo_url)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO reports (
+          user_id,
+          street,
+          description,
+          urgency,
+          photo_url,
+          latitude,
+          longitude,
+          geocoding_status,
+          geocoded_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::varchar, CASE WHEN $8::varchar = 'ok' THEN NOW() ELSE NULL END)
         RETURNING id
       `,
-      [req.user.id, input.street, input.description, input.urgency, input.photoUrl],
+      [
+        req.user.id,
+        input.street,
+        input.description,
+        input.urgency,
+        input.photoUrl,
+        geocoding.latitude,
+        geocoding.longitude,
+        geocoding.status,
+      ],
     );
 
     const reportId = reportResult.rows[0].id;
@@ -265,6 +417,7 @@ reportsRouter.post('/', async (req, res, next) => {
     );
 
     await client.query('COMMIT');
+    clearReportCache();
 
     const report = await getReportById(reportId);
     const historyByReportId = await getHistoryByReportIds([reportId]);
@@ -283,12 +436,18 @@ reportsRouter.post('/', async (req, res, next) => {
 
 reportsRouter.get('/my', async (req, res, next) => {
   try {
-    const rows = await getReportRows('WHERE reports.user_id = $1', [req.user.id]);
+    const paginationInput = parsePagination(req.query);
+    const { rows, pagination } = await getPaginatedReportRows(
+      'WHERE reports.user_id = $1',
+      [req.user.id],
+      paginationInput,
+    );
     const historyByReportId = await getHistoryByReportIds(rows.map((row) => row.id));
 
     return res.json({
       data: {
         reports: rows.map((row) => publicReport(row, historyByReportId.get(row.id) || [])),
+        pagination,
       },
       error: null,
     });
@@ -299,12 +458,14 @@ reportsRouter.get('/my', async (req, res, next) => {
 
 reportsRouter.get('/', requireFuncionario, async (req, res, next) => {
   try {
-    const rows = await getReportRows();
+    const paginationInput = parsePagination(req.query);
+    const { rows, pagination } = await getPaginatedReportRows('', [], paginationInput);
     const historyByReportId = await getHistoryByReportIds(rows.map((row) => row.id));
 
     return res.json({
       data: {
         reports: rows.map((row) => publicReport(row, historyByReportId.get(row.id) || [])),
+        pagination,
       },
       error: null,
     });
@@ -450,6 +611,7 @@ reportsRouter.patch('/:id', requireFuncionario, async (req, res, next) => {
     }
 
     await client.query('COMMIT');
+    clearReportCache();
 
     const report = await getReportById(reportId);
     const historyByReportId = await getHistoryByReportIds([reportId]);
@@ -482,6 +644,8 @@ reportsRouter.delete('/:id', requireFuncionario, async (req, res, next) => {
         error: { message: 'Reporte no encontrado' },
       });
     }
+
+    clearReportCache();
 
     return res.json({
       data: { deletedReportId: String(reportId) },

@@ -27,6 +27,8 @@ const demoReports = [
     status: 'verificado',
     scheduledDate: '2026-05-20',
     createdAt: '2026-04-28T10:15:00.000Z',
+    latitude: -33.63709,
+    longitude: -71.62996,
     history: [
       {
         status: 'pendiente',
@@ -50,6 +52,8 @@ const demoReports = [
     status: 'resuelto',
     scheduledDate: '2026-04-02',
     createdAt: '2026-03-12T16:45:00.000Z',
+    latitude: -33.63215,
+    longitude: -71.62061,
     history: [
       {
         status: 'pendiente',
@@ -134,10 +138,14 @@ async function seedDemoReports() {
           urgency,
           status,
           scheduled_date,
+          latitude,
+          longitude,
+          geocoding_status,
+          geocoded_at,
           created_at,
           updated_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $7)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'ok', $9, $9, $9)
         RETURNING id
       `,
       [
@@ -147,6 +155,8 @@ async function seedDemoReports() {
         report.urgency,
         report.status,
         report.scheduledDate,
+        report.latitude,
+        report.longitude,
         report.createdAt,
       ],
     );

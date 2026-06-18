@@ -19,7 +19,27 @@ export interface ApiReport {
   createdAt: string;
   updatedAt: string;
   scheduledDate: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geocodingStatus: 'pendiente' | 'ok' | 'fallido' | 'sin_api_key';
   statusHistory: ApiStatusHistoryEntry[];
+}
+
+export interface ApiPagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface ApiMapReport {
+  id: string;
+  street: string;
+  urgency: UrgencyLevel;
+  status: ReportStatus;
+  latitude: number;
+  longitude: number;
+  createdAt: string;
 }
 
 interface ReportResponse {
@@ -28,6 +48,11 @@ interface ReportResponse {
 
 interface ReportsResponse {
   reports: ApiReport[];
+  pagination: ApiPagination;
+}
+
+interface MapReportsResponse {
+  reports: ApiMapReport[];
 }
 
 interface PublicReportStatsResponse {
@@ -56,17 +81,25 @@ export function createReport(
   });
 }
 
-export function getMyReports(token: string): Promise<ReportsResponse> {
-  return apiRequest<ReportsResponse>('/reports/my', { token });
+function buildPaginationQuery(page = 1, pageSize = 10): string {
+  return `page=${page}&pageSize=${pageSize}`;
 }
 
-export function getAllReports(token: string): Promise<ReportsResponse> {
+export function getMyReports(token: string, page = 1, pageSize = 10): Promise<ReportsResponse> {
+  return apiRequest<ReportsResponse>(`/reports/my?${buildPaginationQuery(page, pageSize)}`, { token });
+}
+
+export function getAllReports(token: string, page = 1, pageSize = 10): Promise<ReportsResponse> {
   // El backend valida que este token pertenezca a un funcionario
-  return apiRequest<ReportsResponse>('/reports', { token });
+  return apiRequest<ReportsResponse>(`/reports?${buildPaginationQuery(page, pageSize)}`, { token });
 }
 
 export function getPublicReportStats(): Promise<PublicReportStatsResponse> {
   return apiRequest<PublicReportStatsResponse>('/reports/stats');
+}
+
+export function getMapReports(): Promise<MapReportsResponse> {
+  return apiRequest<MapReportsResponse>('/reports/map');
 }
 
 export function getReportById(token: string, id: string): Promise<ReportResponse> {

@@ -21,7 +21,7 @@ import {
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../core/auth/AuthContext';
 import { getMyReports } from '../../core/api/reportsApi';
-import type { ApiReport } from '../../core/api/reportsApi';
+import type { ApiPagination, ApiReport } from '../../core/api/reportsApi';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import type { ReportStatus } from '../../core/data/ReportContext';
 import './MyReportsPage.css';
@@ -40,6 +40,7 @@ const URGENCY_COLORS: Record<string, string> = {
   media: 'warning',
   alta: 'danger',
 };
+const PAGE_SIZE = 10;
 
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('es-CL', {
@@ -158,6 +159,8 @@ export function MyReportsPage() {
   const { user, isLoading, token } = useAuth();
   const [presentToast] = useIonToast();
   const [reports, setReports] = useState<ApiReport[]>([]);
+  const [pagination, setPagination] = useState<ApiPagination | null>(null);
+  const [page, setPage] = useState(1);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
   const router = useIonRouter();
   const location = useLocation();
@@ -180,8 +183,11 @@ export function MyReportsPage() {
     if (isLoading || !token || !user || user.role === 'funcionario') return;
 
     setIsLoadingReports(true);
-    getMyReports(token)
-      .then((res) => setReports(res.reports))
+    getMyReports(token, page, PAGE_SIZE)
+      .then((res) => {
+        setReports(res.reports);
+        setPagination(res.pagination);
+      })
       .catch(() =>
         presentToast({
           message: 'No se pudieron cargar tus reportes.',
@@ -191,7 +197,7 @@ export function MyReportsPage() {
         }),
       )
       .finally(() => setIsLoadingReports(false));
-  }, [token, isLoading]);
+  }, [token, isLoading, page]);
 
   if (isLoading || !user || user.role === 'funcionario') {
     return null;
@@ -223,11 +229,26 @@ export function MyReportsPage() {
               <p>Cargando reportes...</p>
             </section>
           ) : userReports.length > 0 ? (
-            <div className="my-reports-list">
-              {userReports.map((report) => (
-                <ReportCard key={report.id} report={report} />
-              ))}
-            </div>
+            <>
+              <div className="my-reports-list">
+                {userReports.map((report) => (
+                  <ReportCard key={report.id} report={report} />
+                ))}
+              </div>
+              {pagination && pagination.totalPages > 1 && (
+                <div className="my-reports-pagination">
+                  <IonButton fill="outline" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}>
+                    Anterior
+                  </IonButton>
+                  <span>
+                    Página {pagination.page} de {pagination.totalPages}
+                  </span>
+                  <IonButton fill="outline" disabled={page >= pagination.totalPages} onClick={() => setPage((current) => current + 1)}>
+                    Siguiente
+                  </IonButton>
+                </div>
+              )}
+            </>
           ) : (
             <section className="my-reports-empty" aria-label="Sin reportes">
               <IonIcon icon={alertCircleOutline} aria-hidden="true" />
