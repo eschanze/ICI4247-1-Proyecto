@@ -11,6 +11,7 @@
   "dependencies": {
     "@ionic/react": "^8.0.0",
     "@ionic/react-router": "^8.0.0",
+    "@react-google-maps/api": "^2.20.8",
     "ionicons": "^7.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

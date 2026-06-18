@@ -1,15 +1,15 @@
 import { IonButton, IonContent, IonIcon, IonPage } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../core/auth/AuthContext';
+import { useAuth } from '../../../core/auth/AuthContext';
 import {
   calendarOutline,
   checkmarkDoneOutline,
   clipboardOutline,
   searchOutline,
 } from 'ionicons/icons';
-import { getPublicReportStats } from '../../core/api/reportsApi';
-import landingBackground from '../../assets/landing_bg.png';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
+import { getPublicReportStats } from '../../../core/api/reportsApi';
+import landingBackground from '../../../assets/landing_bg.png';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
 import './LandingPage.css';
 
 // Texto e íconos para cada paso que se muestra en la landing page

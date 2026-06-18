@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { IonButton, IonContent, IonInput, IonItem, IonPage, useIonRouter } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../core/auth/AuthContext';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
 import './LoginPage.css';
 
 export function LoginPage() {

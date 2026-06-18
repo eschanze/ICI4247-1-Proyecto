@@ -7,13 +7,13 @@ import { AppHeader } from '../components/AppHeader';
 import './AppRouter.css';
 
 // Lazy loading de las páginas para reducir el bundle inicial (code splitting)
-const LandingPage = lazy(() => import('../../features/landing/LandingPage').then(m => ({ default: m.LandingPage })));
-const LoginPage = lazy(() => import('../../features/login/LoginPage').then(m => ({ default: m.LoginPage })));
-const MapPage = lazy(() => import('../../features/map/MapPage').then(m => ({ default: m.MapPage })));
-const RegisterPage = lazy(() => import('../../features/register/RegisterPage').then(m => ({ default: m.RegisterPage })));
-const ReportPage = lazy(() => import('../../features/report/ReportPage').then(m => ({ default: m.ReportPage })));
-const MyReportsPage = lazy(() => import('../../features/my-reports/MyReportsPage').then(m => ({ default: m.MyReportsPage })));
-const AdminReportsPage = lazy(() => import('../../features/admin-reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
+const LandingPage = lazy(() => import('../../features/landing/presentation/LandingPage').then(m => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import('../../features/login/presentation/LoginPage').then(m => ({ default: m.LoginPage })));
+const MapPage = lazy(() => import('../../features/map/presentation/MapPage').then(m => ({ default: m.MapPage })));
+const RegisterPage = lazy(() => import('../../features/register/presentation/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ReportPage = lazy(() => import('../../features/report/presentation/ReportPage').then(m => ({ default: m.ReportPage })));
+const MyReportsPage = lazy(() => import('../../features/my-reports/presentation/MyReportsPage').then(m => ({ default: m.MyReportsPage })));
+const AdminReportsPage = lazy(() => import('../../features/admin-reports/presentation/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
 
 function LazyFallback() {
   return (
@@ -28,9 +28,16 @@ export function AppRouter() {
     <IonReactRouter>
       {/* AppHeader y AppFooter son componentes globales que se muestran en todas las páginas */}
       <AppHeader />
-      <IonRouterOutlet className="app-router-outlet">
-        {/* Rutas principales de la app */}
-        <Route exact path="/inicio" render={() => <Suspense fallback={<LazyFallback />}><LandingPage /></Suspense>} />
+        <IonRouterOutlet className="app-router-outlet">
+          {/* 
+            Nota: Se decidió volver al patrón de render con un Suspense individual por ruta. 
+            Antes estábamos usando component={...} envuelto en un Suspense global, pero 
+            IonRouterOutlet cachea las páginas internamente. Eso hacía que 
+            los useEffect que cargan datos desde la API no se dispararan de nuevo al navegar 
+            (por ejemplo, al redirigir después de hacer login). 
+            Con esto nos aseguramos de montar instancias limpias de las vistas cuando corresponde.
+          */}
+          <Route exact path="/inicio" render={() => <Suspense fallback={<LazyFallback />}><LandingPage /></Suspense>} />
         <Route exact path="/login" render={() => <Suspense fallback={<LazyFallback />}><LoginPage /></Suspense>} />
         <Route exact path="/registro" render={() => <Suspense fallback={<LazyFallback />}><RegisterPage /></Suspense>} />
         <Route exact path="/reportar" render={() => <Suspense fallback={<LazyFallback />}><ReportPage /></Suspense>} />

@@ -11,7 +11,9 @@ RUN npm ci
 COPY . .
 
 # Pasamos la URL de la API relativa para que Nginx la enrute al backend
+ARG VITE_GOOGLE_MAPS_API_KEY
 ENV VITE_API_URL=/api
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
 
 RUN npm run build
 

@@ -13,9 +13,9 @@ import {
   useIonToast,
 } from '@ionic/react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../core/auth/AuthContext';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
-import '../login/LoginPage.css';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
+import '../../login/presentation/LoginPage.css';
 import './RegisterPage.css';
 
 // Idealmente se debería obtener esta información de una API

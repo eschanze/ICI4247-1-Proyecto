@@ -23,11 +23,11 @@ import {
 } from '@ionic/react';
 import { cameraOutline, closeCircleOutline, cloudUploadOutline } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../core/auth/AuthContext';
-import { createReport } from '../../core/api/reportsApi';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { UrgencyLevel } from '../../core/data/ReportContext';
-import '../login/LoginPage.css';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { createReport } from '../../../core/api/reportsApi';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
+import type { UrgencyLevel } from '../../../core/data/ReportContext';
+import '../../login/presentation/LoginPage.css';
 import './ReportPage.css';
 
 export function ReportPage() {

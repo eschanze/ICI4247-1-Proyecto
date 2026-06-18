@@ -18,12 +18,12 @@ import {
   trashOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../core/auth/AuthContext';
-import { deleteReport, getAllReports, updateReport as updateReportApi } from '../../core/api/reportsApi';
-import type { ApiPagination, ApiReport } from '../../core/api/reportsApi';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { ReportStatus, UrgencyLevel } from '../../core/data/ReportContext';
-import '../my-reports/MyReportsPage.css'; // Reutilizamos los estilos de "Mis Reportes"
+import { useAuth } from '../../../core/auth/AuthContext';
+import { deleteReport, getAllReports, updateReport as updateReportApi } from '../../../core/api/reportsApi';
+import type { ApiPagination, ApiReport } from '../../../core/api/reportsApi';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
+import type { ReportStatus, UrgencyLevel } from '../../../core/data/ReportContext';
+import '../../my-reports/presentation/MyReportsPage.css'; // Reutilizamos los estilos de "Mis Reportes"
 
 // Configuración de etiquetas y colores para cada estado de reporte.
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {

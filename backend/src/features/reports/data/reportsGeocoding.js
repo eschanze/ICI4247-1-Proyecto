@@ -1,4 +1,4 @@
-import { env } from '../config/env.js';
+import { env } from '../../../core/config/env.js';
 
 const DEFAULT_COMMUNE_CONTEXT = 'Santo Domingo, Chile';
 

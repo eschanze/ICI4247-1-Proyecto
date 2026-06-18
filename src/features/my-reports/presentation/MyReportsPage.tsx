@@ -19,11 +19,11 @@ import {
   timeOutline,
 } from 'ionicons/icons';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../core/auth/AuthContext';
-import { getMyReports } from '../../core/api/reportsApi';
-import type { ApiPagination, ApiReport } from '../../core/api/reportsApi';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { ReportStatus } from '../../core/data/ReportContext';
+import { useAuth } from '../../../core/auth/AuthContext';
+import { getMyReports } from '../../../core/api/reportsApi';
+import type { ApiPagination, ApiReport } from '../../../core/api/reportsApi';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
+import type { ReportStatus } from '../../../core/data/ReportContext';
 import './MyReportsPage.css';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {

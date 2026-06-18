@@ -166,11 +166,11 @@ Se adoptó un enfoque responsive utilizando los contenidos que se vieron en clas
 
 ### EP 2.1: Creación del servidor backend
 
-Se creó un servidor Node.js con Express dentro de la carpeta `backend/`. La estructura de la aplicación en `backend/src/app.js` (configuración de Express, CORS, parseo JSON, y montaje de rutas) y `backend/src/server.js` (inicio del proceso). Las variables de entorno se centralizan en `backend/src/config/env.js` y se cargan desde un archivo `.env`. El servidor expone sus rutas bajo el prefijo `/api` y queda disponible en `http://localhost:5000/api`. Incluye manejo genérico de rutas no encontradas (404) y manejo de errores (500) que devuelven JSON consistente.
+Se creó un servidor Node.js con Express dentro de la carpeta `backend/`. La estructura de la aplicación en `backend/src/core/server/createApp.js` (configuración de Express, CORS, parseo JSON, y montaje de rutas) y `backend/src/server.js` (inicio del proceso). Las variables de entorno se centralizan en `backend/src/core/config/env.js` y se cargan desde un archivo `.env`. El servidor expone sus rutas bajo el prefijo `/api` y queda disponible en `http://localhost:5000/api`. Incluye manejo genérico de rutas no encontradas (404) y manejo de errores (500) que devuelven JSON consistente.
 
 ### EP 2.2: Base de datos relacional
 
-Se integró PostgreSQL mediante el driver `pg`. La conexión se gestiona a través de un pool en `backend/src/db/pool.js`, y el esquema se define en `backend/src/db/schema.sql`, ejecutable con el script `npm run db:init` (que corre `backend/src/db/init-db.js`).
+Se integró PostgreSQL mediante el driver `pg`. La conexión se gestiona a través de un pool en `backend/src/core/database/pool.js`, y el esquema se define en `backend/src/core/database/schema.sql`, ejecutable con el script `npm run db:init` (que corre `backend/src/core/database/init-db.js`).
 
 El modelo relacional contempla tres tablas:
 
@@ -239,7 +239,7 @@ La pantalla `/login` (`LoginPage`) permite ingresar usuario/email y contraseña,
 La protección se implementa dentro de cada página. `ReportPage`, `MyReportsPage` y `AdminReportsPage` verifican si el usuario está autenticado y si su rol corresponde; en caso contrario, redirigen a `/login` o `/inicio`. El `AppHeader` adapta dinámicamente los enlaces de navegación según el rol del usuario.
 
 **(c) Generación y validación de JWT:**
-El backend genera tokens con `jsonwebtoken` incluyendo `id`, `username` y `role` del usuario, con expiración de 8 horas. El middleware `requireAuth` en `backend/src/middleware/auth.middleware.js` valida el token en cada request protegida, extrayendo los datos del usuario y adjuntándolos a `req.user`. El frontend persiste el token en `localStorage` y lo restaura al recargar la página validándolo contra `GET /api/auth/me`.
+El backend genera tokens con `jsonwebtoken` incluyendo `id`, `username` y `role` del usuario, con expiración de 8 horas. El middleware `requireAuth` en `backend/src/core/middleware/auth.middleware.js` valida el token en cada request protegida, extrayendo los datos del usuario y adjuntándolos a `req.user`. El frontend persiste el token en `localStorage` y lo restaura al recargar la página validándolo contra `GET /api/auth/me`.
 
 **(d) Diferenciación por roles:**
 Existen dos roles: `ciudadano` y `funcionario`. El registro público siempre crea ciudadanos (el rol se fuerza en el backend); los funcionarios se crean de forma controlada en la base de datos. **Para facilitar la evaluación de la EP2, `npm run db:init` deja creada una cuenta demo de funcionario con contraseña hasheada usando bcrypt.** El middleware `requireFuncionario` bloquea con `403` las rutas administrativas si el token no pertenece a un funcionario. En el frontend, el `AuthContext` expone el rol del usuario para adaptar la navegación y las vistas.
@@ -385,7 +385,15 @@ Si prefieres levantar el proyecto manualmente, componente por componente, sigue 
 npm install
 ```
 
-2. Iniciar el servidor de desarrollo:
+2. (Importante) Configurar variables de entorno:
+Copiar el archivo `.env.example` a `.env` en la raíz del proyecto y añadir una API Key de Google Maps para habilitar el mapa interactivo.
+```bash
+cp .env.example .env
+```
+Edita `.env` e ingresa tu `VITE_GOOGLE_MAPS_API_KEY`.
+Esa key del frontend debe tener habilitada **Maps JavaScript API**. La key del backend para geocodificar direcciones va separada en `backend/.env` como `GOOGLE_GEOCODING_API_KEY` y debe tener habilitada **Geocoding API**.
+
+3. Iniciar el servidor de desarrollo:
 ```bash
 npm run dev
 ```

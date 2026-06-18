@@ -1,10 +1,10 @@
+import { GoogleMap, MarkerF, useJsApiLoader } from '@react-google-maps/api';
 import { useEffect, useMemo, useState } from 'react';
-import { IonBadge, IonContent, IonIcon, IonPage, IonSpinner, useIonToast } from '@ionic/react';
-import { locationOutline } from 'ionicons/icons';
-import { getMapReports } from '../../core/api/reportsApi';
-import type { ApiMapReport } from '../../core/api/reportsApi';
-import { usePageTitle } from '../../core/hooks/usePageTitle';
-import type { ReportStatus } from '../../core/data/ReportContext';
+import { IonBadge, IonContent, IonPage, IonSpinner, useIonToast } from '@ionic/react';
+import { getMapReports } from '../../../core/api/reportsApi';
+import type { ApiMapReport } from '../../../core/api/reportsApi';
+import { usePageTitle } from '../../../core/hooks/usePageTitle';
+import type { ReportStatus } from '../../../core/data/ReportContext';
 import './MapPage.css';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
@@ -15,14 +15,13 @@ const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   resuelto: { label: 'Resuelto', color: 'success' },
 };
 
-function getMapBounds(reports: ApiMapReport[]) {
+// Nota: Necesitamos calcular dinámicamente dónde centrar la cámara del mapa.
+// Como no todos los reportes están exactamente juntos, promediamos las latitudes 
+// y longitudes extremas de la lista de reportes cargada para que la cámara 
+// abarque el área donde están ubicados.
+function getMapCenter(reports: ApiMapReport[]) {
   if (reports.length === 0) {
-    return {
-      minLat: -33.66,
-      maxLat: -33.58,
-      minLng: -71.66,
-      maxLng: -71.55,
-    };
+    return { lat: -33.647047, lng: -71.622541 }; // Centro por defecto (Santo Domingo)
   }
 
   const latitudes = reports.map((report) => report.latitude);
@@ -31,24 +30,10 @@ function getMapBounds(reports: ApiMapReport[]) {
   const maxLat = Math.max(...latitudes);
   const minLng = Math.min(...longitudes);
   const maxLng = Math.max(...longitudes);
-  const latPadding = Math.max((maxLat - minLat) * 0.18, 0.01);
-  const lngPadding = Math.max((maxLng - minLng) * 0.18, 0.01);
 
   return {
-    minLat: minLat - latPadding,
-    maxLat: maxLat + latPadding,
-    minLng: minLng - lngPadding,
-    maxLng: maxLng + lngPadding,
-  };
-}
-
-function getMarkerPosition(report: ApiMapReport, bounds: ReturnType<typeof getMapBounds>) {
-  const left = ((report.longitude - bounds.minLng) / (bounds.maxLng - bounds.minLng)) * 100;
-  const top = ((bounds.maxLat - report.latitude) / (bounds.maxLat - bounds.minLat)) * 100;
-
-  return {
-    left: `${Math.min(Math.max(left, 4), 96)}%`,
-    top: `${Math.min(Math.max(top, 6), 94)}%`,
+    lat: (minLat + maxLat) / 2,
+    lng: (minLng + maxLng) / 2,
   };
 }
 
@@ -59,6 +44,14 @@ export function MapPage() {
   const [isLoadingReports, setIsLoadingReports] = useState(true);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [presentToast] = useIonToast();
+
+  // Cargamos el SDK de Google Maps de forma asíncrona.
+  // Es crítico que la API key esté en el .env (como VITE_GOOGLE_MAPS_API_KEY) 
+  // para que esto funcione sin revelar nuestras claves en el código fuente de GitHub.
+  const { isLoaded: isMapLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+  });
 
   useEffect(() => {
     getMapReports()
@@ -77,7 +70,7 @@ export function MapPage() {
       .finally(() => setIsLoadingReports(false));
   }, []);
 
-  const bounds = useMemo(() => getMapBounds(reports), [reports]);
+  const mapCenter = useMemo(() => getMapCenter(reports), [reports]);
   const selectedReport = reports.find((report) => report.id === selectedReportId) ?? reports[0] ?? null;
 
   return (
@@ -85,32 +78,35 @@ export function MapPage() {
       <IonContent className="map-content" scrollY={false}>
         <div className="map-layout">
           <section className="map-canvas" aria-label="Mapa de reportes georreferenciados">
-            <div className="map-grid" aria-hidden="true" />
-
-            {isLoadingReports ? (
+            {isLoadingReports || !isMapLoaded ? (
               <div className="map-loading">
                 <IonSpinner name="crescent" />
-                <span>Cargando reportes...</span>
+                <span>Cargando mapa...</span>
               </div>
             ) : reports.length > 0 ? (
-              reports.map((report) => {
-                const statusConfig = STATUS_CONFIG[report.status];
-                const markerPosition = getMarkerPosition(report, bounds);
-                const isSelected = report.id === selectedReport?.id;
+              <GoogleMap
+                mapContainerStyle={{ width: '100%', height: '100%' }}
+                center={mapCenter}
+                zoom={14}
+                options={{
+                  disableDefaultUI: false,
+                  zoomControl: true,
+                }}
+              >
+                {reports.map((report) => {
+                  const isSelected = report.id === selectedReport?.id;
 
-                return (
-                  <button
-                    key={report.id}
-                    className={`map-marker ${isSelected ? 'selected' : ''}`}
-                    style={markerPosition}
-                    onClick={() => setSelectedReportId(report.id)}
-                    aria-label={`Reporte en ${report.street}`}
-                    title={`${report.street} - ${statusConfig.label}`}
-                  >
-                    <IonIcon icon={locationOutline} aria-hidden="true" />
-                  </button>
-                );
-              })
+                  return (
+                    <MarkerF
+                      key={report.id}
+                      position={{ lat: report.latitude, lng: report.longitude }}
+                      onClick={() => setSelectedReportId(report.id)}
+                      title={report.street}
+                      animation={isSelected ? google.maps.Animation.BOUNCE : undefined}
+                    />
+                  );
+                })}
+              </GoogleMap>
             ) : (
               <div className="map-empty">
                 <h2>Sin reportes geocodificados</h2>

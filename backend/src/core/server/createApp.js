@@ -3,10 +3,10 @@ import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
-import { env } from './config/env.js';
-import { authRouter } from './routes/auth.routes.js';
-import { healthRouter } from './routes/health.routes.js';
-import { reportsRouter } from './routes/reports.routes.js';
+import { env } from '../config/env.js';
+import { authRouter } from '../../features/auth/presentation/routes/auth.routes.js';
+import { healthRouter } from '../../features/health/presentation/routes/health.routes.js';
+import { reportsRouter } from '../../features/reports/presentation/routes/reports.routes.js';
 
 // Función principal para crear la aplicación Express
 export function createApp() {

@@ -14,52 +14,9 @@
 }
 
 .map-canvas {
-  background:
-    linear-gradient(90deg, rgba(41, 98, 70, 0.10) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(41, 98, 70, 0.10) 1px, transparent 1px),
-    #dfeeda;
-  background-size: 54px 54px;
   border-right: var(--app-border-width) solid var(--app-ink);
   min-height: 100%;
-  overflow: hidden;
   position: relative;
-}
-
-.map-grid {
-  background:
-    linear-gradient(135deg, transparent 0 42%, rgba(51, 91, 134, 0.22) 43% 48%, transparent 49% 100%),
-    linear-gradient(28deg, transparent 0 52%, rgba(93, 128, 71, 0.18) 53% 60%, transparent 61% 100%);
-  inset: 0;
-  position: absolute;
-}
-
-.map-marker {
-  align-items: center;
-  background: var(--ion-color-danger);
-  border: var(--app-border-width) solid var(--app-ink);
-  border-radius: 999px;
-  box-shadow: 4px 4px 0 var(--app-ink);
-  color: #ffffff;
-  cursor: pointer;
-  display: flex;
-  height: 42px;
-  justify-content: center;
-  padding: 0;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  width: 42px;
-  z-index: 2;
-}
-
-.map-marker.selected {
-  background: var(--ion-color-primary);
-  height: 50px;
-  width: 50px;
-  z-index: 3;
-}
-
-.map-marker ion-icon {
-  font-size: 1.35rem;
 }
 
 .map-sidebar {
