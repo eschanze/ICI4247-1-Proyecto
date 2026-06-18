@@ -305,11 +305,19 @@ La API incorpora medidas de seguridad en varias capas: las consultas a PostgreSQ
 
 ### EF 4: Optimización de consultas y respuesta eficiente
 
-<!-- TODO: Documentar índices en la base de datos (ya definidos en schema.sql), paginación de resultados, caché, y otras optimizaciones de queries. -->
+Se optimizaron los listados principales de reportes incorporando paginación en `GET /api/reports` y `GET /api/reports/my`. Ambos endpoints aceptan `page` y `pageSize`, devuelven solo la página solicitada y agregan metadata (`totalItems`, `totalPages`) para que el frontend pueda navegar entre resultados sin cargar todos los registros de una vez. En la interfaz, `/mis-reportes` y `/admin-reportes` muestran controles de página simples, manteniendo el flujo anterior pero con menor volumen de datos por respuesta.
+
+En la base de datos se reforzaron los índices para las consultas más usadas: búsqueda por usuario, ordenamiento por fecha de creación, combinación `user_id + created_at`, estado del reporte y coordenadas geográficas. Además, los historiales de estado se siguen obteniendo en una sola consulta por página usando `WHERE report_id = ANY(...)`, evitando hacer una consulta separada por cada reporte.
+
+También se agregó un caché en memoria con TTL corto (30 segundos) para lecturas públicas de alta frecuencia, específicamente estadísticas de `/inicio` y datos livianos del mapa. Cuando se crea, actualiza o elimina un reporte, el backend limpia ese caché para evitar mostrar información obsoleta durante operaciones administrativas o ciudadanas.
 
 ### EF 5: Integración con servicio externo (AWS o APIs de terceros)
 
-<!-- TODO: Documentar integración con servicio externo. Google Maps API se usa en frontend pero con datos dummy. Evaluar conexión del mapa a datos reales del backend, integración con servicio de email (Nodemailer/SendGrid) para notificaciones, o subida de fotos a S3/Cloudinary. -->
+Se integró Google Geocoding API desde el backend para convertir la dirección ingresada por el ciudadano en coordenadas (`latitude`, `longitude`). La API key se lee desde `GOOGLE_GEOCODING_API_KEY` en `backend/.env`, por lo que no queda expuesta en el código del frontend. Al crear un reporte, el backend normaliza la dirección agregando el contexto `"Santo Domingo, Chile"` cuando corresponde, consulta Google y guarda las coordenadas si la respuesta es exitosa.
+
+La integración se implementó como un proceso tolerante a fallos: si Google no responde, la key no está configurada o la dirección no puede geocodificarse, el reporte igualmente se crea y queda marcado con `geocoding_status` (`ok`, `fallido` o `sin_api_key`). Esto evita que un servicio externo bloquee la funcionalidad principal del sistema.
+
+El mapa dejó de usar datos estáticos y ahora consume `GET /api/reports/map`, un endpoint público y liviano que entrega solo reportes con coordenadas y los campos necesarios para visualización. La vista `/mapa` renderiza marcadores reales según la latitud y longitud guardadas, permite seleccionar reportes y muestra estado, urgencia y coordenadas del caso seleccionado.
 
 ### EF 6: Despliegue con Docker
 
@@ -331,6 +339,7 @@ La API incorpora medidas de seguridad en varias capas: las consultas a PostgreSQ
 ### Prerrequisitos
 - **Node.js** (v18 o superior recomendado)
 - **PostgreSQL** (para la integración de la BBDD de la EP2)
+- **Docker Desktop** (solo necesario para EF6, cuando se agregue el despliegue con Docker)
 
 ### Frontend
 
@@ -370,6 +379,13 @@ Para inicializar las tablas de PostgreSQL, renombrar `backend/.env.example` a `b
 ```bash
 cd backend
 npm run db:init
+```
+
+Si ya existe una base creada y solo se quieren aplicar columnas/índices nuevos sin borrar datos, usar:
+
+```bash
+cd backend
+npm run db:migrate
 ```
 
 **Importante:** `npm run db:init` requiere que **PostgreSQL esté instalado y ejecutándose**, y que exista una base de datos accesible mediante `DATABASE_URL` (por ejemplo `postgres://postgres:postgres@localhost:5432/no_cables`). El script crea las tablas necesarias y también deja una cuenta demo para facilitar la evaluación.

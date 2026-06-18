@@ -16,8 +16,10 @@ A continuación se resumen los endpoints reales del backend usados en la EP2. In
 ## Reportes
 
 - `POST /api/reports`: crea un reporte como usuario autenticado.
-- `GET /api/reports/my`: lista reportes del usuario autenticado.
-- `GET /api/reports`: lista todos los reportes. Requiere rol `funcionario`.
+- `GET /api/reports/stats`: devuelve estadísticas públicas usadas en `/inicio`.
+- `GET /api/reports/map`: devuelve reportes públicos con coordenadas para `/mapa`.
+- `GET /api/reports/my?page=1&pageSize=10`: lista reportes del usuario autenticado con paginación.
+- `GET /api/reports?page=1&pageSize=10`: lista todos los reportes con paginación. Requiere rol `funcionario`.
 - `GET /api/reports/:id`: muestra un reporte respetando permisos.
 - `PATCH /api/reports/:id`: actualiza estado, urgencia o fecha programada. Requiere rol `funcionario`.
 - `DELETE /api/reports/:id`: elimina un reporte. Requiere rol `funcionario`.
@@ -51,4 +53,6 @@ Cuando hay error:
 - `urgency`: `baja`, `media` o `alta`.
 - `status`: `pendiente`, `verificado`, `agendado`, `en_proceso` o `resuelto`.
 - `scheduledDate`: opcional, en formato `YYYY-MM-DD`.
+- `latitude` y `longitude`: se calculan desde Google Geocoding al crear el reporte cuando hay API key configurada.
+- `page` y `pageSize`: opcionales en listados; si no se envían se usa página 1 con 10 registros.
 - Las rutas protegidas requieren `Authorization: Bearer <token>`.
