@@ -19,4 +19,5 @@ export const env = {
   databaseUrl:
     process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/no_cables',
   jwtSecret: process.env.JWT_SECRET || 'secreto-local-desarrollo',
+  googleGeocodingApiKey: process.env.GOOGLE_GEOCODING_API_KEY || '',
 };

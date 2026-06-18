@@ -6,19 +6,200 @@
   --padding-start: 0;
 }
 
-.map-container {
-  /* Contenedor del iframe de Google Maps. */
-  width: 100%;
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
   height: 100%;
-  background: var(--app-surface);
-  border-left: var(--app-border-width) solid var(--app-ink);
-  border-right: var(--app-border-width) solid var(--app-ink);
-  box-sizing: border-box;
+  width: 100%;
 }
 
-.map-container iframe {
-  /* El iframe ocupa todo el espacio del contenedor. */
-  display: block;
-  width: 100%;
-  height: 100%;
+.map-canvas {
+  background:
+    linear-gradient(90deg, rgba(41, 98, 70, 0.10) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(41, 98, 70, 0.10) 1px, transparent 1px),
+    #dfeeda;
+  background-size: 54px 54px;
+  border-right: var(--app-border-width) solid var(--app-ink);
+  min-height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-grid {
+  background:
+    linear-gradient(135deg, transparent 0 42%, rgba(51, 91, 134, 0.22) 43% 48%, transparent 49% 100%),
+    linear-gradient(28deg, transparent 0 52%, rgba(93, 128, 71, 0.18) 53% 60%, transparent 61% 100%);
+  inset: 0;
+  position: absolute;
+}
+
+.map-marker {
+  align-items: center;
+  background: var(--ion-color-danger);
+  border: var(--app-border-width) solid var(--app-ink);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--app-ink);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  height: 42px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  z-index: 2;
+}
+
+.map-marker.selected {
+  background: var(--ion-color-primary);
+  height: 50px;
+  width: 50px;
+  z-index: 3;
+}
+
+.map-marker ion-icon {
+  font-size: 1.35rem;
+}
+
+.map-sidebar {
+  background: var(--app-paper);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.map-sidebar h1 {
+  font-size: 2rem;
+  line-height: 1;
+  margin: 6px 0 0;
+}
+
+.map-selected-report {
+  background: var(--app-surface);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: 5px 5px 0 var(--app-ink);
+  padding: 18px;
+}
+
+.map-selected-report h2 {
+  font-size: 1.1rem;
+  line-height: 1.25;
+  margin: 0 0 12px;
+}
+
+.map-selected-report p,
+.map-sidebar-empty {
+  color: #52606d;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 12px 0 0;
+}
+
+.map-report-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.map-report-badges ion-badge {
+  border: var(--app-border-width) solid var(--app-ink);
+  border-radius: 0;
+  font-weight: 800;
+  padding: 5px 10px;
+  text-transform: capitalize;
+}
+
+.map-report-list {
+  display: grid;
+  gap: 10px;
+}
+
+.map-report-list button {
+  background: #ffffff;
+  border: var(--app-border-width) solid var(--app-ink);
+  color: var(--app-ink);
+  cursor: pointer;
+  display: grid;
+  font-family: var(--ion-font-family);
+  gap: 4px;
+  padding: 12px;
+  text-align: left;
+}
+
+.map-report-list button.active {
+  background: rgba(var(--ion-color-primary-rgb), 0.14);
+  box-shadow: 3px 3px 0 var(--app-ink);
+}
+
+.map-report-list span {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.map-report-list small {
+  color: #52606d;
+  font-weight: 700;
+}
+
+.map-loading,
+.map-empty {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.88);
+  border: var(--app-border-width) solid var(--app-ink);
+  box-shadow: var(--app-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  left: 50%;
+  max-width: 320px;
+  padding: 26px;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
+
+.map-empty h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.map-empty p,
+.map-loading span {
+  color: #52606d;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .map-content {
+    --padding-bottom: 0;
+  }
+
+  .map-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .map-canvas {
+    border-bottom: var(--app-border-width) solid var(--app-ink);
+    border-right: none;
+    min-height: 48vh;
+  }
+
+  .map-sidebar {
+    max-height: 42vh;
+    padding: 16px;
+  }
+
+  .map-sidebar h1 {
+    font-size: 1.5rem;
+  }
 }

@@ -56,6 +56,10 @@ export function createApp() {
 
     const statusCode = err.statusCode || 500;
 
+    if (env.nodeEnv === 'development') {
+      console.error(err);
+    }
+
     res.status(statusCode).json({
       data: null,
       error: {
