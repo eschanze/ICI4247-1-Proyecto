@@ -34,6 +34,8 @@ const STATUS_CONFIG: Record<ReportStatus, { label: string; color: string }> = {
   resuelto: { label: 'Resuelto', color: 'success' },
 };
 
+const STATUS_FLOW: ReportStatus[] = ['pendiente', 'verificado', 'agendado', 'en_proceso', 'resuelto'];
+
 // Mapea nivel de urgencia a un color Ionic para los badges.
 const URGENCY_COLORS: Record<string, string> = {
   baja: 'success',
@@ -81,17 +83,46 @@ function AdminReportCard({
   const statusConfig = STATUS_CONFIG[report.status];
   const urgencyColor = URGENCY_COLORS[report.urgency] ?? 'medium';
 
-  const handleStatusChange = async (newStatus: ReportStatus) => {
+  const handleStatusChange = (newStatus: ReportStatus) => {
     if (newStatus === report.status) return;
-    try {
-      const res = await updateReportApi(token!, String(report.id), {
-        status: newStatus,
-        comment: 'Cambio de estado por administrador.',
-      });
-      onReportUpdated(res.report);
-    } catch {
-      presentToast({ message: 'No se pudo actualizar el estado.', duration: 3000, position: 'top', color: 'danger' });
-    }
+
+    const isRollback = STATUS_FLOW.indexOf(newStatus) < STATUS_FLOW.indexOf(report.status);
+
+    // Confirmamos cada cambio de estado para que el funcionario pueda dejar contexto en el historial.
+    // Si es retroceso, marcamos el aviso como destructivo porque el backend limpiará información posterior.
+    presentAlert({
+      header: isRollback ? 'Confirmar retroceso de estado' : 'Confirmar cambio de estado',
+      message: isRollback
+        ? `Vas a retroceder de "${STATUS_CONFIG[report.status].label}" a "${STATUS_CONFIG[newStatus].label}". Se eliminarán las etapas posteriores y se limpiarán los comentarios anteriores del historial.`
+        : `El reporte pasará a estado "${STATUS_CONFIG[newStatus].label}".`,
+      inputs: [
+        {
+          name: 'comment',
+          type: 'textarea',
+          placeholder: 'Comentario opcional para la línea de tiempo',
+        },
+      ],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: isRollback ? 'Confirmar retroceso' : 'Confirmar',
+          role: isRollback ? 'destructive' : 'confirm',
+          handler: async (data?: { comment?: string }) => {
+            try {
+              const comment = data?.comment?.trim() || null;
+              const res = await updateReportApi(token!, String(report.id), {
+                status: newStatus,
+                comment,
+              });
+              onReportUpdated(res.report);
+              presentToast({ message: 'Estado actualizado.', duration: 2500, position: 'top', color: 'success' });
+            } catch {
+              presentToast({ message: 'No se pudo actualizar el estado.', duration: 3000, position: 'top', color: 'danger' });
+            }
+          },
+        },
+      ],
+    });
   };
 
   const handleUrgencyChange = async (newUrgency: UrgencyLevel) => {
@@ -167,7 +198,7 @@ function AdminReportCard({
               <IonLabel>Estado:</IonLabel>
               <IonSelect
                 value={report.status}
-                onIonChange={e => handleStatusChange(e.detail.value)}
+                onIonChange={e => handleStatusChange(e.detail.value as ReportStatus)}
                 interface="popover"
               >
                 <IonSelectOption value="pendiente">Pendiente</IonSelectOption>

@@ -295,9 +295,13 @@ Se aplicó "code splitting" en `AppRouter.tsx` usando `React.lazy()` y `<Suspens
 
 Cumpliendo con una sugerencia que se me hizo en la evaluación de la EP1, se ajustó la redirección después del inicio de sesión para que cada rol llegue directamente a su flujo principal. El ciudadano ahora aterriza en `/mis-reportes`, donde puede revisar el seguimiento de sus solicitudes, y el funcionario entra en `/admin-reportes`, que es el panel operativo para gestionar todos los reportes del sistema.
 
+**(d) Mejoras en indicadores y gestión de estados:**
+
+La página `/inicio` ahora muestra datos reales del backend para "Reportes activos" y "Vecinos participantes", evitando métricas hardcodeadas. En el panel de funcionario, cada cambio de estado abre un diálogo para confirmar la acción y agregar un comentario opcional que queda visible en la línea de tiempo del reporte. Si el cambio implica retroceder en el flujo, el diálogo advierte explícitamente que se eliminará información posterior del historial antes de confirmar.
+
 ### EF 3: Seguridad avanzada en API
 
-La API incorpora medidas de seguridad en varias capas: las consultas a PostgreSQL usan parámetros preparados para reducir riesgo de inyección SQL, las contraseñas se almacenan con hash mediante `bcrypt`, y CORS se restringe a una whitelist de orígenes configurados. Además, Express ahora usa `helmet` para agregar headers HTTP de seguridad y `express-rate-limit` para limitar cada IP a 100 solicitudes cada 15 minutos, reduciendo exposición ante abuso automatizado o ráfagas de peticiones.
+La API incorpora medidas de seguridad en varias capas: las consultas a PostgreSQL usan parámetros preparados para reducir riesgo de inyección SQL, las contraseñas se almacenan con hash mediante `bcrypt`, y CORS se restringe a una whitelist de orígenes configurados. Además, Express ahora usa `helmet` para agregar headers HTTP de seguridad y `express-rate-limit` para limitar cada IP a 100 solicitudes cada 5 minutos, reduciendo exposición ante abuso automatizado o ráfagas de peticiones.
 
 ### EF 4: Optimización de consultas y respuesta eficiente
 

@@ -30,6 +30,11 @@ interface ReportsResponse {
   reports: ApiReport[];
 }
 
+interface PublicReportStatsResponse {
+  activeReports: number;
+  participantNeighbors: number;
+}
+
 interface DeleteReportResponse {
   deletedReportId: string;
 }
@@ -58,6 +63,10 @@ export function getMyReports(token: string): Promise<ReportsResponse> {
 export function getAllReports(token: string): Promise<ReportsResponse> {
   // El backend valida que este token pertenezca a un funcionario
   return apiRequest<ReportsResponse>('/reports', { token });
+}
+
+export function getPublicReportStats(): Promise<PublicReportStatsResponse> {
+  return apiRequest<PublicReportStatsResponse>('/reports/stats');
 }
 
 export function getReportById(token: string, id: string): Promise<ReportResponse> {

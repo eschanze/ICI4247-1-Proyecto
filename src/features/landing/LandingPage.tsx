@@ -1,4 +1,5 @@
 import { IonButton, IonContent, IonIcon, IonPage } from '@ionic/react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import {
   calendarOutline,
@@ -6,18 +7,10 @@ import {
   clipboardOutline,
   searchOutline,
 } from 'ionicons/icons';
+import { getPublicReportStats } from '../../core/api/reportsApi';
 import landingBackground from '../../assets/landing_bg.png';
 import { usePageTitle } from '../../core/hooks/usePageTitle';
 import './LandingPage.css';
-
-// Datos para la sección de estadísticas rápidas en la landing page
-// Por ahora son falsos, en la entrega 2 se reemplazarán por datos reales obtenidos del backend
-const programStats = [
-  { label: 'Reportes activos', value: '2' },
-  { label: 'Metros de cable retirados', value: '3.420 m' },
-  { label: 'Sectores cubiertos', value: '14' },
-  { label: 'Vecinos participantes', value: '870' },
-];
 
 // Texto e íconos para cada paso que se muestra en la landing page
 const workflowSteps = [
@@ -46,6 +39,37 @@ const workflowSteps = [
 export function LandingPage() {
   usePageTitle('Inicio - Programa No+Cables');
   const { user } = useAuth();
+  const [activeReports, setActiveReports] = useState<number | null>(null);
+  const [participantNeighbors, setParticipantNeighbors] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    // Pedimos solo las métricas públicas para no forzar login en la página de inicio.
+    getPublicReportStats()
+      .then((stats) => {
+        if (!isMounted) return;
+        setActiveReports(stats.activeReports);
+        setParticipantNeighbors(stats.participantNeighbors);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setActiveReports(0);
+        setParticipantNeighbors(0);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const programStats = [
+    // Estos dos valores vienen de la base; los otros siguen siendo indicadores programáticos.
+    { label: 'Reportes activos', value: activeReports === null ? '...' : String(activeReports) },
+    { label: 'Metros de cable retirados', value: '3.420 m' },
+    { label: 'Sectores cubiertos', value: '14' },
+    { label: 'Vecinos participantes', value: participantNeighbors === null ? '...' : String(participantNeighbors) },
+  ];
 
   return (
     <IonPage>

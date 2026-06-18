@@ -7,6 +7,13 @@ export const reportsRouter = Router();
 
 const URGENCY_VALUES = new Set(['baja', 'media', 'alta']);
 const STATUS_VALUES = new Set(['pendiente', 'verificado', 'agendado', 'en_proceso', 'resuelto']);
+const STATUS_ORDER = {
+  pendiente: 0,
+  verificado: 1,
+  agendado: 2,
+  en_proceso: 3,
+  resuelto: 4,
+};
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function badRequest(message) {
@@ -186,6 +193,34 @@ function validateReportUpdate(body = {}) {
 
   return updates;
 }
+
+reportsRouter.get('/stats', async (_req, res, next) => {
+  try {
+    // Dejamos esta métrica pública porque /inicio la usa antes de que exista sesión.
+    const result = await pool.query(
+      `
+        SELECT
+          COUNT(*) FILTER (WHERE reports.status <> 'resuelto')::int AS active_reports,
+          (
+            SELECT COUNT(*)::int
+            FROM users
+            WHERE role = 'ciudadano'
+          ) AS participant_neighbors
+        FROM reports
+      `,
+    );
+
+    return res.json({
+      data: {
+        activeReports: result.rows[0].active_reports,
+        participantNeighbors: result.rows[0].participant_neighbors,
+      },
+      error: null,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 reportsRouter.use(requireAuth);
 
@@ -378,6 +413,33 @@ reportsRouter.patch('/:id', requireFuncionario, async (req, res, next) => {
 
     // Solo agregamos historial cuando cambia realmente el estado
     if (input.status && input.status !== currentReport.status) {
+      const isStatusRollback = STATUS_ORDER[input.status] < STATUS_ORDER[currentReport.status];
+
+      if (isStatusRollback) {
+        // Al retroceder, mantenemos solo la línea de tiempo que sigue siendo válida para el estado actual.
+        const statusesToDiscard = Object.entries(STATUS_ORDER)
+          .filter(([, order]) => order > STATUS_ORDER[input.status])
+          .map(([status]) => status);
+
+        await client.query(
+          `
+            DELETE FROM report_status_history
+            WHERE report_id = $1
+              AND status = ANY($2::text[])
+          `,
+          [reportId, statusesToDiscard],
+        );
+
+        await client.query(
+          `
+            UPDATE report_status_history
+            SET comment = NULL
+            WHERE report_id = $1
+          `,
+          [reportId],
+        );
+      }
+
       await client.query(
         `
           INSERT INTO report_status_history (report_id, status, comment, changed_by_user_id)

@@ -46,48 +46,12 @@ interface ReportContextValue {
   updateReport: (id: string, updates: Partial<Report>, comment?: string) => void;
 }
 
-const REPORTES_INICIALES: Report[] = [
-  {
-    id: crypto.randomUUID(),
-    authorUsername: 'ciudadano',
-    street: 'Av. Florida 6131',
-    description: 'Cables colgando a baja altura sobre la vereda. Es un peligro para peatones y ciclistas en la vía.',
-    urgency: 'alta',
-    photoDataUrl: null,
-    status: 'verificado',
-    createdAt: '2026-04-28T10:15:00.000Z',
-    scheduledDate: '2026-05-20',
-    statusHistory: [
-      { status: 'pendiente', date: '2026-04-28T10:15:00.000Z' },
-      { status: 'verificado', date: '2026-04-30T14:22:00.000Z', comment: 'Verificado en terreno por funcionario Pepito Pérez.' },
-    ],
-  },
-  {
-    id: crypto.randomUUID(),
-    authorUsername: 'ciudadano',
-    street: 'Los Pajaritos 245',
-    description: 'Cable de telecomunicaciones en desuso apoyado sobre un árbol. Riesgo de caída si hay viento.',
-    urgency: 'media',
-    photoDataUrl: null,
-    status: 'resuelto',
-    createdAt: '2026-03-12T16:45:00.000Z',
-    scheduledDate: '2026-04-02',
-    statusHistory: [
-      { status: 'pendiente', date: '2026-03-12T16:45:00.000Z' },
-      { status: 'verificado', date: '2026-03-14T09:10:00.000Z', comment: 'Cable corresponde a VTR. Se coordina retiro.' },
-      { status: 'agendado', date: '2026-03-20T11:00:00.000Z', comment: 'Retiro agendado para el 02/04.' },
-      { status: 'en_proceso', date: '2026-04-02T08:00:00.000Z' },
-      { status: 'resuelto', date: '2026-04-02T12:30:00.000Z', comment: 'Cable retirado exitosamente. Caso cerrado.' },
-    ],
-  },
-];
-
 const ReportContext = createContext<ReportContextValue | null>(null);
 
 // ReportProvider mantiene el estado global de reportes y lo expone a toda la app.
-// En esta versión local, los datos viven en useState y se pierden al recargar la página.
+// Lo conservamos como compatibilidad de la EP1, pero los datos reales ya viven en el backend.
 export function ReportProvider({ children }: { children: ReactNode }) {
-  const [reports, setReports] = useState<Report[]>(REPORTES_INICIALES);
+  const [reports, setReports] = useState<Report[]>([]);
 
   const addReport = (data: NewReportData, authorUsername: string) => {
     const now = new Date().toISOString();

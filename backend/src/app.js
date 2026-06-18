@@ -15,9 +15,9 @@ export function createApp() {
   // Headers HTTP de seguridad (X-Content-Type-Options, X-Frame-Options, etc.)
   app.use(helmet());
 
-  // Limitador de tasa: máximo 100 solicitudes por IP cada 15 minutos
+  // Limitador de tasa: máximo 100 solicitudes por IP cada 5 minutos
   app.use(rateLimit({
-    windowMs: 15 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 100,
     standardHeaders: true,
     legacyHeaders: false,
