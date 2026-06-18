@@ -321,7 +321,21 @@ El mapa dejó de usar datos estáticos y ahora consume `GET /api/reports/map`, u
 
 ### EF 6: Despliegue con Docker
 
-<!-- TODO: Documentar creación de Dockerfile para backend y frontend, docker-compose para orquestación de servicios (API, base de datos PostgreSQL, frontend), y pruebas de despliegue local. -->
+Se implementó una orquestación completa del proyecto utilizando Docker y Docker Compose para garantizar un entorno consistente y reproducible. El despliegue consta de tres contenedores principales interconectados en una red virtual:
+
+**(a) Contenedores y Dockerfiles:**
+
+- **Base de datos (`db`):** Utiliza la imagen oficial de PostgreSQL (`postgres:15-alpine`), con un volumen persistente (`pgdata`) para resguardar los datos ante reinicios del contenedor.
+- **Backend (`backend`):** Empaquetado usando un `Dockerfile` basado en `node:20-alpine`. El contenedor instala las dependencias e inicia el servidor Express en el puerto 5000 de forma aislada, consumiendo la variable de entorno `DATABASE_URL` sobrescrita en `docker-compose.yml` para apuntar directamente al contenedor de PostgreSQL.
+- **Frontend (`frontend`):** Se utilizó un _multi-stage build_. La primera etapa compila la aplicación optimizada de React+Vite con Node.js inyectando la variable de entorno `VITE_API_URL=/api`. La segunda etapa usa un contenedor ligero de Nginx (`nginx:alpine`) para servir los archivos estáticos resultantes.
+
+**(b) Reverse proxy con Nginx:**
+
+Para evitar problemas de configuración de puertos y bloqueos por políticas CORS, se configuró Nginx (`nginx.conf`) no solo para servir la aplicación en la raíz (`/`), sino también para actuar como un _reverse proxy_. Todas las peticiones que ingresan al puerto 80 con la ruta `/api/` son redirigidas transparentemente al contenedor del backend, unificando todo el proyecto bajo un único puerto de entrada.
+
+**(c) Orquestación:**
+
+El archivo `docker-compose.yml` en la raíz del proyecto permite levantar la infraestructura completa con el comando `docker compose up -d --build`. Se configuraron dependencias (`depends_on`) para asegurar que el backend espere el inicio de la base de datos, y el frontend espere al backend. Posteriormente, mediante la ejecución del script `db:init` en el contenedor del backend, se poblaron las tablas iniciales, logrando un despliegue local 100% funcional y listo para la evaluación.
 
 ---
 
@@ -338,10 +352,33 @@ El mapa dejó de usar datos estáticos y ahora consume `GET /api/reports/map`, u
 
 ### Prerrequisitos
 - **Node.js** (v18 o superior recomendado)
-- **PostgreSQL** (para la integración de la BBDD de la EP2)
-- **Docker Desktop** (solo necesario para EF6, cuando se agregue el despliegue con Docker)
+- **PostgreSQL** (para la integración de la BBDD local)
+- **Docker Desktop** (para el despliegue orquestado de la EF6)
 
-### Frontend
+### Ejecución con Docker (Recomendado)
+
+Esta es la forma más rápida y limpia de levantar el proyecto completo (Base de datos, Backend y Frontend) sin necesidad de configurar dependencias locales más allá de Docker.
+
+1. Abre una terminal en la raíz del proyecto y asegúrate de tener Docker Desktop corriendo.
+2. Construye y levanta los contenedores en segundo plano:
+   ```bash
+   docker compose up -d --build
+   ```
+3. Inicializa y puebla la base de datos con los datos de prueba:
+   ```bash
+   docker compose exec backend npm run db:init
+   ```
+4. Abre tu navegador y dirígete a `http://localhost/` (sin puerto, ya que Nginx se encarga del enrutamiento internamente desde el puerto 80).
+
+Para detener el proyecto, ejecuta `docker compose down`.
+
+---
+
+### Ejecución Local Manual (Sin Docker)
+
+Si prefieres levantar el proyecto manualmente, componente por componente, sigue estos pasos:
+
+#### Frontend
 
 1. Instalar las dependencias de Node:
 ```bash

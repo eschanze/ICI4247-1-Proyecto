@@ -21,14 +21,14 @@ const demoCitizenPassword = 'Ciudadano123';
 const demoReports = [
   {
     authorUsername: 'ciudadano1',
-    street: 'Av. Florida 6131',
+    street: 'Horacio Larraín 80',
     description: 'Cables colgando a baja altura sobre la vereda. Es un peligro para peatones y ciclistas en la vía.',
     urgency: 'alta',
     status: 'verificado',
     scheduledDate: '2026-05-20',
     createdAt: '2026-04-28T10:15:00.000Z',
-    latitude: -33.63709,
-    longitude: -71.62996,
+    latitude: -33.647047,
+    longitude: -71.622541,
     history: [
       {
         status: 'pendiente',
@@ -46,14 +46,14 @@ const demoReports = [
   },
   {
     authorUsername: 'ciudadano2',
-    street: 'Los Pajaritos 245',
+    street: 'Los Pajaritos 11',
     description: 'Cable de telecomunicaciones en desuso apoyado sobre un árbol. Riesgo de caída si hay viento.',
     urgency: 'media',
     status: 'resuelto',
     scheduledDate: '2026-04-02',
     createdAt: '2026-03-12T16:45:00.000Z',
-    latitude: -33.63215,
-    longitude: -71.62061,
+    latitude: -33.664724,
+    longitude: -71.623058,
     history: [
       {
         status: 'pendiente',

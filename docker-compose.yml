@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: no_cables_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: contraseña_postgres_aca
+      POSTGRES_DB: no_cables
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: no_cables_backend
+    env_file:
+      - ./backend/.env
+    environment:
+      # Sobrescribimos el host local por el nombre del contenedor de BBDD
+      - DATABASE_URL=postgres://postgres:contraseña_postgres_aca@db:5432/no_cables
+      - PORT=5000
+      - NODE_ENV=production
+      - FRONTEND_ORIGIN=http://localhost
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: no_cables_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
